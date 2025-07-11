@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/output.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Dream Auto - Quality Used Cars Under $20K | Minnesota</title>
+    <meta name="description" content="Dream Auto - Minnesota's trusted used vehicle experts. Quality pre-owned cars under $20K. Fast, simple, and affordable car buying experience.">
+</head>
+    <body>
+    <header class="fixed w-full top-0 z-50 bg-transparent backdrop-blur-sm transition-all duration-300">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <a href="/" class="flex items-center space-x-2">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-600 to-blue-600 flex items-center justify-center text-white font-bold text-xl">DA</div>
+            <span class="text-xl font-bold text-white">Dream Auto</span>
+          </a>
+
+          <!-- Desktop Nav -->
+          <nav class="hidden md:flex space-x-6">
+            <a href="#inventory" class="text-white hover:text-primary-200 font-medium py-2 border-b-2 border-transparent hover:border-primary-300 transition-colors text-lg">Inventory</a>
+            <a href="#about" class="text-white hover:text-primary-200 font-medium py-2 border-b-2 border-transparent hover:border-primary-300 transition-colors text-lg">About</a>
+            <a href="tel:123-123-1234" class="border-2 border-white text-white hover:bg-white hover:text-primary-700 font-medium py-2 px-4 rounded-lg transition transform hover:-translate-y-0.5 text-lg flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+              </svg>
+              <span>123-123-1234</span>
+            </a>
+          </nav>
+
+          <!-- Mobile Menu Button -->
+          <button id="mobile-menu-button" class="md:hidden text-white hover:text-primary-200 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-50 hidden" aria-hidden="true">
+      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" id="mobile-backdrop"></div>
+      <div class="relative z-50 bg-white w-80 max-w-full h-full ml-auto transform transition-transform duration-300 translate-x-full">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center space-x-2">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-600 to-blue-600 flex items-center justify-center text-white font-bold text-xl">DA</div>
+              <span class="text-xl font-bold text-gray-900">Dream Auto</span>
+            </div>
+            <button id="close-menu" class="text-gray-500 hover:text-gray-700 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <nav class="space-y-4">
+            <a href="#about" class="block text-gray-700 hover:bg-gray-100 px-4 py-3 rounded-lg transition">About</a>
+            <a href="tel:123-123-1234" class="block border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-4 py-3 rounded-lg transition font-medium">
+              <div class="flex items-center space-x-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                </svg>
+                <span>123-123-1234 <span class="text-xs opacity-75 font-normal">| Tap To Call</span></span>
+              </div>
+            </a>
+          </nav>
+
+          <div class="mt-8">
+            <a
+              href="#inventory"
+              class="block w-full text-center bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition shadow-md hover:shadow-lg"
+            >
+              View Inventory
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <main class="flex-grow">
+      <!-- Enhanced Hero Section -->
+      <section class="relative text-white min-h-screen flex items-center pt-0">
+        <!-- Background image with overlay - covers entire viewport including navbar area -->
+        <div class="absolute inset-0 z-0">
+          <img src="/images/dream-hero-background.webp" alt="Dream Auto Car Dealership" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-r from-primary-900/70 to-blue-900/60"></div>
+        </div>
+
+        <!-- Content - adjust spacing account for navbar -->
+        <div class="relative z-10 container mx-auto px-4 text-center w-full hero-content">
+          <div class="max-w-3xl mx-auto pt-16 md:pt-24">
+            <!-- New bubble tag above H1 -->
+            <div
+              class="inline-block bg-gradient-to-r from-primary-500/90 to-secondary-500/90 text-white px-4 py-1.5 rounded-full text-sm md:text-base font-medium mb-3 shadow-lg backdrop-blur-sm fade-up-1 hero-subtitle"
+            >
+              Fast, Simple & Affordable
+            </div>
+
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight fade-up-1 hero-title">Quality Used Cars Under $20K</h1>
+
+            <div class="w-20 h-1 bg-gradient-to-r from-primary-500 to-blue-500 mx-auto my-6 fade-up-2"></div>
+
+            <!-- Combined paragraph with typewriter animation -->
+            <p class="text-lg md:text-xl opacity-95 mb-8 md:mb-10 max-w-2xl mx-auto fade-up-2 hero-description">
+              Minnesota's trusted used vehicle experts helping you
+              <span class="text-white inline-block">
+                <span class="text-animation font-bold text-primary-300 inline-block" style="min-width: 200px; display: inline-block"></span>
+              </span>
+              <span class="whitespace-nowrap">without the usual headaches and delays</span>
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center fade-up-3 hero-buttons">
+              <a
+                href="#inventory"
+                class="inline-block bg-white text-primary-700 font-bold py-3 md:py-4 px-8 md:px-10 rounded-lg shadow-lg hover:bg-gray-100 transition transform hover:-translate-y-1 text-base md:text-lg hero-button"
+              >
+                View Inventory
+              </a>
+              <a
+                href="#contact"
+                class="inline-block border-2 border-white text-white font-bold py-3 md:py-4 px-8 md:px-10 rounded-lg hover:bg-white hover:text-primary-700 transition transform hover:-translate-y-1 text-base md:text-lg hero-button"
+              >
+                Get Financing
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enhanced scroll indicator with animation -->
+        <div class="absolute bottom-6 md:bottom-8 left-0 right-0 mx-auto w-full flex justify-center z-10 animate-bounce">
+          <div class="flex flex-col items-center">
+            <span class="text-white text-opacity-75 text-xs mb-2 hidden md:block">Scroll to explore</span>
+            <div class="w-8 h-12 border-2 border-white border-opacity-40 rounded-full flex justify-center">
+              <div class="w-1.5 h-3 bg-white bg-opacity-80 rounded-full mt-2 animate-[bounce_1.5s_ease-in-out_infinite]"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="inventory" class="py-16">
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold text-center mb-12">Our Inventory</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Placeholder Car 1 -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div class="w-full h-48 bg-gray-200"></div>
+              <div class="p-6">
+                <h3 class="text-xl font-bold">Placeholder Car</h3>
+                <p class="text-gray-600">Details about the car.</p>
+              </div>
+            </div>
+            <!-- Placeholder Car 2 -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div class="w-full h-48 bg-gray-200"></div>
+              <div class="p-6">
+                <h3 class="text-xl font-bold">Placeholder Car</h3>
+                <p class="text-gray-600">Details about the car.</p>
+              </div>
+            </div>
+            <!-- Placeholder Car 3 -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div class="w-full h-48 bg-gray-200"></div>
+              <div class="p-6">
+                <h3 class="text-xl font-bold">Placeholder Car</h3>
+                <p class="text-gray-600">Details about the car.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Location & Hours Section -->
+      <section id="location" class="bg-gray-50 py-16">
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold text-center mb-4">Location & Hours</h2>
+          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Located at <a target="_blank" href="https://www.google.com/maps/place/580+Dodge+Ave+NW,+Elk+River,+MN+55330" class="text-primary-600 hover:text-primary-800 underline">580 Dodge Ave NW, Elk River, MN 55330</a>. We're conveniently located right in downtown Elk River.
+          </p>
+          
+          <!-- Desktop: Side by side, Mobile: Stacked -->
+          <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <!-- Google Map -->
+            <div class="rounded-lg overflow-hidden shadow-lg order-2 lg:order-1">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d492.7559235767137!2d-93.55525543910755!3d45.30802314421276!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x52b3695acfd0d3c7%3A0xa1fa444abad4c42e!2s580%20Dodge%20Ave%20NW%2C%20Elk%20River%2C%20MN%2055330%2C%20USA!5e1!3m2!1sen!2sth!4v1752229948382!5m2!1sen!2sth"
+                class="w-full"
+                height="400"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+            
+            <!-- Hours Section -->
+            <div class="bg-white rounded-lg shadow-lg p-8 order-1 lg:order-2">
+              <div class="text-center lg:text-left">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center justify-center lg:justify-start">
+                  <svg class="w-6 h-6 mr-3 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Our Hours
+                </h3>
+                
+                <div class="space-y-4">
+                  <!-- Monday through Saturday -->
+                  <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                    <span class="font-medium text-gray-700">Mon - Sat</span>
+                    <span class="text-primary-600 font-semibold">10:00 AM - 6:00 PM</span>
+                  </div>
+                  
+                  <!-- Sunday -->
+                  <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                    <span class="font-medium text-gray-700">Sunday</span>
+                    <span class="text-gray-500 font-semibold">Closed</span>
+                  </div>
+                </div>
+                
+                
+                <!-- Contact Info -->
+                <div class="mt-6 text-center lg:text-left">
+                  <a href="#contact" class="inline-flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition transform hover:-translate-y-0.5 shadow-md hover:shadow-lg">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                    Contact Us
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+      <div class="container mx-auto px-4 text-center">
+        <div class="flex items-center justify-center space-x-2 mb-4">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary-600 to-blue-600 flex items-center justify-center text-white font-bold text-lg">DA</div>
+          <span class="text-xl font-bold">Dream Auto</span>
+        </div>
+        <p class="text-gray-400 mb-2">Quality Used Cars Under $20K</p>
+        <p class="text-gray-400 text-sm">580 Dodge Ave NW, Elk River, MN 55330</p>
+        <div class="mt-4 pt-4 border-t border-gray-700">
+          <p class="text-gray-500 text-sm">&copy; 2025 Dream Auto. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Include JavaScript -->
+    <script src="/js/main.js"></script>
+</body>
+</html>
