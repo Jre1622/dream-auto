@@ -53,10 +53,11 @@
                 <!-- Main Image Slideshow -->
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden">
                     <div class="relative aspect-[4/3]">
-                        <% if (car && car.primary_image) { %>
-                            <img id="mainImage" src="<%= car.primary_image %>" alt="<%= car.year %> <%= car.make %> <%= car.model %>" class="w-full h-full object-cover">
+                        <% if (images && images.length > 0) { %>
+                            <% const primaryImage = images.find(img => img.is_primary) || images[0]; %>
+                            <img id="mainImage" src="<%= primaryImage.image_url %>" alt="<%= car.year %> <%= car.make %> <%= car.model %>" class="w-full h-full object-cover">
                         <% } else { %>
-                            <img id="mainImage" src="/images/coming-soon.webp" alt="Vehicle Image" class="w-full h-full object-cover">
+                            <img id="mainImage" src="/images/placeholder-car.svg" alt="Vehicle Image" class="w-full h-full object-cover">
                         <% } %>
                         
                         <!-- Navigation Arrows -->
@@ -69,7 +70,7 @@
                         
                         <!-- Image Counter -->
                         <div class="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-                            <span id="currentImageIndex">1</span> / <span id="totalImages">1</span>
+                            <span id="currentImageIndex">1</span> / <span id="totalImages"><%= images && images.length > 0 ? images.length : 1 %></span>
                         </div>
                     </div>
                 </div>
@@ -77,14 +78,20 @@
                 <!-- Thumbnail Gallery -->
                 <div class="bg-white rounded-lg shadow-sm p-4">
                     <div class="grid grid-cols-6 gap-2" id="thumbnailGallery">
-                        <!-- Thumbnails will be populated by JavaScript -->
-                        <% if (car && car.primary_image) { %>
-                            <div class="aspect-square rounded-lg overflow-hidden border-2 border-blue-500 cursor-pointer thumbnail" data-image="<%= car.primary_image %>">
-                                <img src="<%= car.primary_image %>" alt="Thumbnail" class="w-full h-full object-cover">
-                            </div>
+                        <% if (images && images.length > 0) { %>
+                            <% images.forEach((image, index) => { %>
+                                <div class="aspect-square rounded-lg overflow-hidden border-2 <%= index === 0 ? 'border-blue-500' : 'border-gray-200' %> cursor-pointer thumbnail" data-image="<%= image.image_url %>">
+                                    <img src="<%= image.image_url %>" alt="Thumbnail <%= index + 1 %>" class="w-full h-full object-cover">
+                                    <% if (image.is_primary) { %>
+                                        <div class="absolute top-1 left-1 bg-green-500 text-white text-xs px-1 rounded">
+                                            ★
+                                        </div>
+                                    <% } %>
+                                </div>
+                            <% }); %>
                         <% } else { %>
-                            <div class="aspect-square rounded-lg overflow-hidden border-2 border-blue-500 cursor-pointer thumbnail" data-image="/images/coming-soon.webp">
-                                <img src="/images/coming-soon.webp" alt="Thumbnail" class="w-full h-full object-cover">
+                            <div class="aspect-square rounded-lg overflow-hidden border-2 border-blue-500 cursor-pointer thumbnail" data-image="/images/placeholder-car.svg">
+                        <img src="/images/placeholder-car.svg" alt="Thumbnail" class="w-full h-full object-cover">
                             </div>
                         <% } %>
                     </div>
@@ -183,15 +190,21 @@
                 <% } %>
                 
                 <!-- Carfax Report -->
-                <% if (car && car.carfax_url) { %>
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Vehicle History</h3>
-                    <a href="<%= car.carfax_url %>" target="_blank" class="block w-full bg-orange-500 text-white text-center py-3 rounded-lg hover:bg-orange-600 transition-colors">
-                        <i class="fas fa-file-alt mr-2"></i>
-                        View Carfax Report
-                    </a>
+                    <% if (car && car.carfax_url) { %>
+                        <a href="<%= car.carfax_url %>" target="_blank" class="block w-full bg-orange-500 text-white text-center py-3 rounded-lg hover:bg-orange-600 transition-colors">
+                            <i class="fas fa-file-alt mr-2"></i>
+                            View Carfax Report
+                        </a>
+                    <% } else { %>
+                        <div class="block w-full bg-gray-100 text-gray-500 text-center py-3 rounded-lg cursor-not-allowed">
+                            <i class="fas fa-clock mr-2"></i>
+                            Carfax Report Coming Soon
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2 text-center">Vehicle history report will be available shortly</p>
+                    <% } %>
                 </div>
-                <% } %>
                 
                 <!-- Contact Actions -->
                 <div class="bg-white rounded-lg shadow-sm p-6">

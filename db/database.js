@@ -11,7 +11,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.error("Database connection error:", err.message);
   } else {
     console.log("Connected to SQLite database");
-    // Create table if not exists
+    // Create cars table
     db.run(
       `CREATE TABLE IF NOT EXISTS cars (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,8 +25,6 @@ const db = new sqlite3.Database(dbPath, (err) => {
       engine TEXT,
       transmission TEXT,
       features TEXT,
-      primary_image TEXT NOT NULL,
-      image_gallery TEXT,
       video_url TEXT,
       carfax_url TEXT NOT NULL,
       is_featured BOOLEAN DEFAULT 0,
@@ -34,9 +32,30 @@ const db = new sqlite3.Database(dbPath, (err) => {
     )`,
       (err) => {
         if (err) {
-          console.error("Table creation error:", err.message);
+          console.error("Cars table creation error:", err.message);
         } else {
           console.log("Cars table created or already exists");
+        }
+      }
+    );
+
+    // Create car_images table for managing multiple images per car
+    db.run(
+      `CREATE TABLE IF NOT EXISTS car_images (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      car_id INTEGER NOT NULL,
+      image_url TEXT NOT NULL,
+      image_key TEXT NOT NULL,
+      display_order INTEGER DEFAULT 0,
+      is_primary BOOLEAN DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (car_id) REFERENCES cars(id) ON DELETE CASCADE
+    )`,
+      (err) => {
+        if (err) {
+          console.error("Car images table creation error:", err.message);
+        } else {
+          console.log("Car images table created or already exists");
         }
       }
     );

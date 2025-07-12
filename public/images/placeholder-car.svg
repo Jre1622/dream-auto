@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#f8fafc"/>
+  <g transform="translate(200,150)">
+    <!-- Car silhouette -->
+    <path d="M-80,-30 L-60,-40 L-20,-40 L20,-40 L60,-40 L80,-30 L80,20 L60,30 L-60,30 L-80,20 Z" fill="#cbd5e1"/>
+    <!-- Wheels -->
+    <circle cx="-50" cy="25" r="12" fill="#64748b"/>
+    <circle cx="50" cy="25" r="12" fill="#64748b"/>
+    <!-- Windows -->
+    <path d="M-50,-35 L-20,-35 L-10,-25 L-40,-25 Z" fill="#94a3b8"/>
+    <path d="M10,-35 L40,-35 L50,-25 L20,-25 Z" fill="#94a3b8"/>
+  </g>
+  <text x="200" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#475569">Coming Soon</text>
+  <text x="200" y="225" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Photos will be available shortly</text>
+</svg>

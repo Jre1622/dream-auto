@@ -1,7 +1,26 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
+const multer = require('multer');
 const db = require('../db/database');
+const { uploadCarImages, getCarImages, deleteCarImage } = require('../utils/imageUpload');
 const router = express.Router();
+
+// Configure multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 20 * 1024 * 1024, // 20MB limit - Increased for high-quality car photos
+    files: 20 // Maximum 20 files - Typical for car dealership inventory
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG, and WebP are allowed.'));
+    }
+  }
+});
 
 // Basic Authentication middleware
 function basicAuth(req, res, next) {
@@ -33,16 +52,31 @@ const adminLimiter = rateLimit({
 });
 
 // Admin Dashboard - Main page
-router.get("/", adminLimiter, basicAuth, (req, res) => {
-  // Get all cars from database
-  db.all("SELECT * FROM cars ORDER BY id DESC", [], (err, cars) => {
-    if (err) {
-      console.error(err);
-      res.render("admin/dashboard", { cars: [], error: "Database error" });
-    } else {
-      res.render("admin/dashboard", { cars, error: null });
-    }
-  });
+router.get("/", adminLimiter, basicAuth, async (req, res) => {
+  try {
+    // Get all cars from database
+    const cars = await new Promise((resolve, reject) => {
+      db.all("SELECT * FROM cars ORDER BY id DESC", [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+
+    // Get primary image for each car
+    const carsWithImages = await Promise.all(cars.map(async (car) => {
+      const images = await getCarImages(car.id);
+      const primaryImage = images.find(img => img.is_primary) || images[0];
+      return {
+        ...car,
+        primary_image: primaryImage ? primaryImage.image_url : '/images/placeholder-car.svg'
+      };
+    }));
+
+    res.render("admin/dashboard", { cars: carsWithImages, error: null });
+  } catch (err) {
+    console.error(err);
+    res.render("admin/dashboard", { cars: [], error: "Database error" });
+  }
 });
 
 // Add Car - GET form
@@ -50,93 +84,171 @@ router.get("/add-car", basicAuth, (req, res) => {
   res.render("admin/add-car", { error: null, success: null });
 });
 
-// Add Car - POST form
-router.post("/add-car", basicAuth, (req, res) => {
+// Add Car - POST form with image upload
+router.post("/add-car", basicAuth, upload.array('images', 20), async (req, res) => {
   const {
     title, year, make, model, price, mileage, vin, engine, transmission,
-    features, primary_image, carfax_url, is_featured
+    features, carfax_url, is_featured
   } = req.body;
 
   const sql = `INSERT INTO cars 
-    (title, year, make, model, price, mileage, vin, engine, transmission, features, primary_image, carfax_url, is_featured) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    (title, year, make, model, price, mileage, vin, engine, transmission, features, carfax_url, is_featured) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   const params = [
     title, parseInt(year), make, model, parseInt(price), parseInt(mileage),
-    vin, engine, transmission, features, primary_image || '/images/coming-soon.webp',
-    carfax_url, is_featured ? 1 : 0
+    vin, engine, transmission, features, carfax_url, is_featured ? 1 : 0
   ];
 
-  db.run(sql, params, function(err) {
-    if (err) {
-      console.error(err);
-      res.render("admin/add-car", { 
-        error: err.message.includes('UNIQUE') ? 'VIN already exists' : 'Database error',
-        success: null 
+  try {
+    // First, insert the car
+    const carId = await new Promise((resolve, reject) => {
+      db.run(sql, params, function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.lastID);
+        }
       });
-    } else {
-      res.render("admin/add-car", { 
-        error: null, 
-        success: `Car added successfully! ID: ${this.lastID}` 
-      });
+    });
+
+    let uploadResults = { successful: [], failed: [], totalUploaded: 0 };
+    
+    // If images were uploaded, process them
+    if (req.files && req.files.length > 0) {
+      uploadResults = await uploadCarImages(req.files, carId);
     }
-  });
+
+    const successMessage = `Car added successfully! ID: ${carId}. Images uploaded: ${uploadResults.totalUploaded}/${req.files ? req.files.length : 0}`;
+    const errorMessage = uploadResults.failed.length > 0 ? 
+      `Some images failed to upload: ${uploadResults.failed.map(f => f.filename).join(', ')}` : null;
+
+    res.render("admin/add-car", { 
+      error: errorMessage,
+      success: successMessage
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.render("admin/add-car", { 
+      error: err.message.includes('UNIQUE') ? 'VIN already exists' : 'Database error',
+      success: null 
+    });
+  }
 });
 
 // Edit Car - GET form
-router.get("/edit-car/:id", basicAuth, (req, res) => {
+router.get("/edit-car/:id", basicAuth, async (req, res) => {
   const carId = req.params.id;
-  db.get("SELECT * FROM cars WHERE id = ?", [carId], (err, car) => {
-    if (err) {
-      console.error(err);
-      res.redirect('/admin');
-    } else if (!car) {
-      res.redirect('/admin');
-    } else {
-      res.render("admin/edit-car", { car, error: null, success: null });
+  
+  try {
+    // Get car details
+    const car = await new Promise((resolve, reject) => {
+      db.get("SELECT * FROM cars WHERE id = ?", [carId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+
+    if (!car) {
+      return res.redirect('/admin');
     }
-  });
+
+    // Get car images
+    const images = await getCarImages(carId);
+
+    res.render("admin/edit-car", { car, images, error: null, success: null });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin');
+  }
 });
 
-// Edit Car - POST form
-router.post("/edit-car/:id", basicAuth, (req, res) => {
+// Edit Car - POST form with image upload
+router.post("/edit-car/:id", basicAuth, upload.array('images', 20), async (req, res) => {
   const carId = req.params.id;
   const {
     title, year, make, model, price, mileage, vin, engine, transmission,
-    features, primary_image, carfax_url, is_featured, sold
+    features, carfax_url, is_featured, sold
   } = req.body;
 
   const sql = `UPDATE cars SET 
     title=?, year=?, make=?, model=?, price=?, mileage=?, vin=?, engine=?, 
-    transmission=?, features=?, primary_image=?, carfax_url=?, is_featured=?, sold=?
+    transmission=?, features=?, carfax_url=?, is_featured=?, sold=?
     WHERE id=?`;
 
   const params = [
     title, parseInt(year), make, model, parseInt(price), parseInt(mileage),
-    vin, engine, transmission, features, primary_image, carfax_url, 
+    vin, engine, transmission, features, carfax_url, 
     is_featured ? 1 : 0, sold ? 1 : 0, carId
   ];
 
-  db.run(sql, params, function(err) {
-    if (err) {
-      console.error(err);
-      db.get("SELECT * FROM cars WHERE id = ?", [carId], (err, car) => {
-        res.render("admin/edit-car", { 
-          car, 
-          error: err.message.includes('UNIQUE') ? 'VIN already exists' : 'Database error',
-          success: null 
-        });
+  try {
+    // Update car details
+    await new Promise((resolve, reject) => {
+      db.run(sql, params, function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
       });
-    } else {
-      db.get("SELECT * FROM cars WHERE id = ?", [carId], (err, car) => {
-        res.render("admin/edit-car", { 
-          car, 
-          error: null, 
-          success: 'Car updated successfully!' 
-        });
-      });
+    });
+
+    let uploadResults = { successful: [], failed: [], totalUploaded: 0 };
+    
+    // If new images were uploaded, process them
+    if (req.files && req.files.length > 0) {
+      uploadResults = await uploadCarImages(req.files, carId);
     }
-  });
+
+    // Get updated car and images
+    const car = await new Promise((resolve, reject) => {
+      db.get("SELECT * FROM cars WHERE id = ?", [carId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+
+    const images = await getCarImages(carId);
+
+    const successMessage = uploadResults.totalUploaded > 0 ? 
+      `Car updated successfully! New images uploaded: ${uploadResults.totalUploaded}/${req.files ? req.files.length : 0}` :
+      'Car updated successfully!';
+    
+    const errorMessage = uploadResults.failed.length > 0 ? 
+      `Some images failed to upload: ${uploadResults.failed.map(f => f.filename).join(', ')}` : null;
+
+    res.render("admin/edit-car", { 
+      car, 
+      images,
+      error: errorMessage,
+      success: successMessage
+    });
+
+  } catch (err) {
+    console.error(err);
+    
+    // Get car and images for error display
+    try {
+      const car = await new Promise((resolve, reject) => {
+        db.get("SELECT * FROM cars WHERE id = ?", [carId], (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        });
+      });
+      const images = await getCarImages(carId);
+      
+      res.render("admin/edit-car", { 
+        car, 
+        images,
+        error: err.message.includes('UNIQUE') ? 'VIN already exists' : 'Database error',
+        success: null 
+      });
+    } catch (fetchErr) {
+      res.redirect('/admin');
+    }
+  }
 });
 
 // Delete Car
@@ -159,6 +271,53 @@ router.post("/toggle-sold/:id", basicAuth, (req, res) => {
     }
     res.redirect('/admin');
   });
+});
+
+// Delete Image
+router.post("/delete-image/:imageId", basicAuth, async (req, res) => {
+  const imageId = req.params.imageId;
+  const carId = req.body.carId;
+  
+  try {
+    const success = await deleteCarImage(imageId);
+    if (success) {
+      res.redirect(`/admin/edit-car/${carId}?success=Image deleted successfully`);
+    } else {
+      res.redirect(`/admin/edit-car/${carId}?error=Failed to delete image`);
+    }
+  } catch (err) {
+    console.error(err);
+    res.redirect(`/admin/edit-car/${carId}?error=Error deleting image`);
+  }
+});
+
+// Set Primary Image
+router.post("/set-primary-image/:imageId", basicAuth, async (req, res) => {
+  const imageId = req.params.imageId;
+  const carId = req.body.carId;
+  
+  try {
+    // First, remove primary status from all images for this car
+    await new Promise((resolve, reject) => {
+      db.run('UPDATE car_images SET is_primary = 0 WHERE car_id = ?', [carId], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+    
+    // Then set the selected image as primary
+    await new Promise((resolve, reject) => {
+      db.run('UPDATE car_images SET is_primary = 1 WHERE id = ?', [imageId], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+    
+    res.redirect(`/admin/edit-car/${carId}?success=Primary image updated`);
+  } catch (err) {
+    console.error(err);
+    res.redirect(`/admin/edit-car/${carId}?error=Error setting primary image`);
+  }
 });
 
 module.exports = router;
