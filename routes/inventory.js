@@ -92,7 +92,7 @@ router.get('/', (req, res) => {
   });
 });
 
-// GET /inventory/:id - Individual car details (placeholder for future implementation)
+// GET /inventory/:id - Individual car details
 router.get('/:id', (req, res) => {
   const carId = req.params.id;
   
@@ -106,8 +106,7 @@ router.get('/:id', (req, res) => {
       return res.status(404).render('error', { message: 'Car not found' });
     }
     
-    // TODO: Create individual car detail page
-    res.json(car); // Temporary response
+    res.render('vehicle-detail', { car });
   });
 });
 
