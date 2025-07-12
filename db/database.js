@@ -29,7 +29,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
       image_gallery TEXT,
       video_url TEXT,
       carfax_url TEXT NOT NULL,
-      is_featured BOOLEAN DEFAULT 0
+      is_featured BOOLEAN DEFAULT 0,
+      sold BOOLEAN DEFAULT 0
     )`,
       (err) => {
         if (err) {

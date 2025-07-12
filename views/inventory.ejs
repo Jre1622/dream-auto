@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/output.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>Inventory - Dream Auto | Quality Used Cars Under $20K</title>
+    <meta name="description" content="Browse our complete inventory of quality used cars under $20K. Find your perfect vehicle at Dream Auto in Elk River, Minnesota." />
+  </head>
+  <body>
+    <%- include('partials/header') %>
+
+    <!-- Main content -->
+    <main class="flex-grow">
+      <!-- Hero Section for Inventory -->
+      <section class="relative bg-cover bg-center text-white py-20 mt-16" style="background-image: url('/images/inventory-background.webp');">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-900/70 to-blue-900/60"></div>
+        <div class="container mx-auto px-4 text-center relative z-10">
+          <h1 class="text-4xl md:text-5xl font-bold mb-4">Our Complete Inventory</h1>
+          <p class="text-xl opacity-90 max-w-2xl mx-auto">
+            Browse our selection of quality used vehicles under $20K. Every car is inspected and comes with a Carfax report.
+          </p>
+        </div>
+      </section>
+
+      <!-- Search and Filter Section -->
+      <section class="bg-gray-50 py-8">
+        <div class="container mx-auto px-4">
+          <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div>
+                  <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                  <select id="title" name="title" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Titles</option>
+                    <option value="clean">Clean</option>
+                    <option value="prior-salvage">Prior Salvage</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="price" class="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
+                  <select id="price" name="price" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Prices</option>
+                            <option value="0-4999">$5k and under</option>
+                            <option value="5000-9999">$5k - $10k</option>
+                            <option value="10000+">$10k+</option>
+                        </select>
+                </div>
+                <div>
+                  <label for="year" class="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                  <select id="year" name="year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Years</option>
+                            <option value="0-2005">2005 and older</option>
+                            <option value="2006-2014">2006 - 2014</option>
+                            <option value="2015+">2015 and up</option>
+                        </select>
+                </div>
+                <div>
+                  <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <select id="status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Status</option>
+                    <option value="0">Available</option>
+                    <option value="1">Sold</option>
+                  </select>
+                </div>
+                <div class="flex items-end">
+                  <button class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-md transition">
+                    Search
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Inventory Grid -->
+      <section class="py-16">
+        <div class="container mx-auto px-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Placeholder Car 1 -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div class="w-full h-48 bg-gray-200 relative">
+                <div class="absolute inset-0 flex items-center justify-center text-gray-500">
+                  <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-xl font-bold text-gray-900">2018 Honda Civic</h3>
+                  <span class="bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded">Available</span>
+                </div>
+                <p class="text-gray-600 mb-3">LX Sedan • 85,000 miles</p>
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-2xl font-bold text-primary-600">$14,995</span>
+                  <span class="text-sm text-gray-500">Est. $280/mo</span>
+                </div>
+                <div class="flex space-x-2">
+                  <button class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded transition">
+                    View Details
+                  </button>
+                  <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Placeholder Car 2 -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div class="w-full h-48 bg-gray-200 relative">
+                <div class="absolute inset-0 flex items-center justify-center text-gray-500">
+                  <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-xl font-bold text-gray-900">2017 Toyota Camry</h3>
+                  <span class="bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded">Available</span>
+                </div>
+                <p class="text-gray-600 mb-3">LE Sedan • 92,000 miles</p>
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-2xl font-bold text-primary-600">$16,495</span>
+                  <span class="text-sm text-gray-500">Est. $315/mo</span>
+                </div>
+                <div class="flex space-x-2">
+                  <button class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded transition">
+                    View Details
+                  </button>
+                  <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Placeholder Car 3 -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div class="w-full h-48 bg-gray-200 relative">
+                <div class="absolute inset-0 flex items-center justify-center text-gray-500">
+                  <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-xl font-bold text-gray-900">2019 Ford Focus</h3>
+                  <span class="bg-yellow-100 text-yellow-800 text-sm font-medium px-2 py-1 rounded">Pending</span>
+                </div>
+                <p class="text-gray-600 mb-3">SE Hatchback • 67,000 miles</p>
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-2xl font-bold text-primary-600">$12,995</span>
+                  <span class="text-sm text-gray-500">Est. $250/mo</span>
+                </div>
+                <div class="flex space-x-2">
+                  <button class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded transition">
+                    View Details
+                  </button>
+                  <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Placeholder Car 4 -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div class="w-full h-48 bg-gray-200 relative">
+                <div class="absolute inset-0 flex items-center justify-center text-gray-500">
+                  <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-xl font-bold text-gray-900">2016 Chevrolet Malibu</h3>
+                  <span class="bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded">Available</span>
+                </div>
+                <p class="text-gray-600 mb-3">LT Sedan • 105,000 miles</p>
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-2xl font-bold text-primary-600">$11,495</span>
+                  <span class="text-sm text-gray-500">Est. $220/mo</span>
+                </div>
+                <div class="flex space-x-2">
+                  <button class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded transition">
+                    View Details
+                  </button>
+                  <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Placeholder Car 5 -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div class="w-full h-48 bg-gray-200 relative">
+                <div class="absolute inset-0 flex items-center justify-center text-gray-500">
+                  <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-xl font-bold text-gray-900">2020 Nissan Sentra</h3>
+                  <span class="bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded">Available</span>
+                </div>
+                <p class="text-gray-600 mb-3">S Sedan • 45,000 miles</p>
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-2xl font-bold text-primary-600">$17,995</span>
+                  <span class="text-sm text-gray-500">Est. $340/mo</span>
+                </div>
+                <div class="flex space-x-2">
+                  <button class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded transition">
+                    View Details
+                  </button>
+                  <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Placeholder Car 6 -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div class="w-full h-48 bg-gray-200 relative">
+                <div class="absolute inset-0 flex items-center justify-center text-gray-500">
+                  <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-xl font-bold text-gray-900">2015 Hyundai Elantra</h3>
+                  <span class="bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded">Available</span>
+                </div>
+                <p class="text-gray-600 mb-3">SE Sedan • 118,000 miles</p>
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-2xl font-bold text-primary-600">$9,995</span>
+                  <span class="text-sm text-gray-500">Est. $190/mo</span>
+                </div>
+                <div class="flex space-x-2">
+                  <button class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded transition">
+                    View Details
+                  </button>
+                  <button class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex justify-center mt-12">
+            <nav class="flex space-x-2">
+              <button class="px-3 py-2 text-gray-500 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                Previous
+              </button>
+              <button class="px-3 py-2 bg-primary-600 text-white border border-primary-600 rounded-md">
+                1
+              </button>
+              <button class="px-3 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                2
+              </button>
+              <button class="px-3 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                3
+              </button>
+              <button class="px-3 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                Next
+              </button>
+            </nav>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <%- include('partials/footer') %>
+
+    <!-- Include JavaScript -->
+    <script src="/js/main.js"></script>
+  </body>
+</html>

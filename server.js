@@ -11,9 +11,13 @@ app.set("views", path.join(__dirname, "views"));
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, "public")));
 
-// Start server
+// Routes
 app.get("/", (req, res) => {
   res.render("index");
+});
+
+app.get("/inventory", (req, res) => {
+  res.render("inventory");
 });
 
 app.listen(PORT, () => {
