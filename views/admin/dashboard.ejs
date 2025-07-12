@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Dream Auto</title>
+    <link href="/css/output.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+                <div class="flex space-x-4">
+                    <a href="/admin/add-car" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Add New Car
+                    </a>
+                    <a href="/" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                        View Site
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <% if (error) { %>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <!-- Cars Table -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Inventory Management</h2>
+                <p class="text-gray-600 mt-1">Total Cars: <%= cars.length %></p>
+            </div>
+
+            <% if (cars.length === 0) { %>
+                <div class="p-8 text-center">
+                    <p class="text-gray-500 text-lg">No cars in inventory yet.</p>
+                    <a href="/admin/add-car" class="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Add Your First Car
+                    </a>
+                </div>
+            <% } else { %>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Car</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% cars.forEach(car => { %>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-16 w-24">
+                                                <img class="h-16 w-24 rounded-lg object-cover" src="<%= car.primary_image %>" alt="<%= car.title %>" onerror="this.src='/images/placeholder-car.jpg'">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900"><%= car.title %></div>
+                                                <div class="text-sm text-gray-500">VIN: <%= car.vin %></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900"><%= car.year %> <%= car.make %> <%= car.model %></div>
+                                        <div class="text-sm text-gray-500"><%= car.mileage.toLocaleString() %> miles</div>
+                                        <div class="text-sm text-gray-500"><%= car.transmission %></div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">$<%= car.price.toLocaleString() %></div>
+                                        <% if (car.is_featured) { %>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                Featured
+                                            </span>
+                                        <% } %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <% if (car.sold) { %>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                Sold
+                                            </span>
+                                        <% } else { %>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Available
+                                            </span>
+                                        <% } %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                        <a href="/admin/edit-car/<%= car.id %>" class="text-blue-600 hover:text-blue-900">Edit</a>
+                                        
+                                        <form method="POST" action="/admin/toggle-sold/<%= car.id %>" class="inline">
+                                            <button type="submit" class="text-yellow-600 hover:text-yellow-900">
+                                                <%= car.sold ? 'Mark Available' : 'Mark Sold' %>
+                                            </button>
+                                        </form>
+                                        
+                                        <form method="POST" action="/admin/delete-car/<%= car.id %>" class="inline" onsubmit="return confirm('Are you sure you want to delete this car?')">
+                                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
