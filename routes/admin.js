@@ -151,7 +151,7 @@ router.get("/edit-car/:id", basicAuth, async (req, res) => {
     // Get car images
     const images = await getCarImages(carId);
 
-    res.render("admin/edit-car-minimal", { car, images, error: null, success: null });
+    res.render("admin/edit-car", { car, images, error: null, success: null });
   } catch (err) {
     console.error(err);
     res.redirect("/admin");
