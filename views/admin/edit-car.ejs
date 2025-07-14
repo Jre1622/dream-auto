@@ -245,16 +245,35 @@
                 // Add click event listener to submit button
                 submitButton.addEventListener('click', function(e) {
                     console.log('Submit button clicked');
+                    console.log('Button disabled state:', submitButton.disabled);
+                    console.log('Button computed style:', window.getComputedStyle(submitButton));
                     
                     // Check form validity
                     if (!form.checkValidity()) {
                         console.log('Form validation failed');
                         form.reportValidity();
+                        e.preventDefault();
                         return;
                     }
                     
                     console.log('Form is valid, submitting...');
                 });
+                
+                // Add additional debugging for button interactions
+                submitButton.addEventListener('mousedown', function(e) {
+                    console.log('Button mousedown event');
+                });
+                
+                submitButton.addEventListener('mouseup', function(e) {
+                    console.log('Button mouseup event');
+                });
+                
+                // Check if button is actually clickable
+                console.log('Button initial state:');
+                console.log('- Disabled:', submitButton.disabled);
+                console.log('- Pointer events:', window.getComputedStyle(submitButton).pointerEvents);
+                console.log('- Z-index:', window.getComputedStyle(submitButton).zIndex);
+                console.log('- Position:', window.getComputedStyle(submitButton).position);
             } else {
                 console.error('Form or submit button not found!');
                 if (!form) console.error('Form element missing');

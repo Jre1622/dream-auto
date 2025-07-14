@@ -184,7 +184,7 @@ router.post("/edit-car/:id", basicAuth, upload.array('images', 20), async (req, 
   const params = [
     title, parseInt(year), make, model, parseInt(price), parseInt(mileage),
     vin, engine, transmission, features, carfax_url, 
-    is_featured ? 1 : 0, sold ? 1 : 0, carId
+    is_featured === '1' ? 1 : 0, sold === '1' ? 1 : 0, carId
   ];
 
   try {
