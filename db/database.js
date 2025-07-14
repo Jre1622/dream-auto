@@ -56,9 +56,39 @@ const db = new sqlite3.Database(dbPath, (err) => {
           console.error("Car images table creation error:", err.message);
         } else {
           console.log("Car images table created or already exists");
+          
+          // Create database indexes for performance optimization
+          createDatabaseIndexes();
         }
       }
     );
+    
+    // Function to create database indexes for optimal query performance
+    function createDatabaseIndexes() {
+      const indexes = [
+        // Cars table indexes - for inventory filtering and sorting
+        'CREATE INDEX IF NOT EXISTS idx_cars_sold ON cars(sold)',
+        'CREATE INDEX IF NOT EXISTS idx_cars_make ON cars(make)',
+        'CREATE INDEX IF NOT EXISTS idx_cars_year ON cars(year)',
+        'CREATE INDEX IF NOT EXISTS idx_cars_price ON cars(price)',
+        'CREATE INDEX IF NOT EXISTS idx_cars_featured ON cars(is_featured)',
+        
+        // Car images table indexes - for image queries
+        'CREATE INDEX IF NOT EXISTS idx_car_images_car_id ON car_images(car_id)',
+        'CREATE INDEX IF NOT EXISTS idx_car_images_display_order ON car_images(car_id, display_order)',
+        'CREATE INDEX IF NOT EXISTS idx_car_images_primary ON car_images(car_id, is_primary)'
+      ];
+      
+      indexes.forEach((indexSQL, i) => {
+        db.run(indexSQL, (err) => {
+          if (err) {
+            console.error(`Index creation error (${i + 1}):`, err.message);
+          } else {
+            console.log(`Database index ${i + 1}/${indexes.length} created successfully`);
+          }
+        });
+      });
+    }
   }
 });
 
