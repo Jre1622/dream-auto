@@ -26,7 +26,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
       transmission TEXT,
       features TEXT,
       video_url TEXT,
-      carfax_url TEXT NOT NULL,
+      carfax_url TEXT,
       is_featured BOOLEAN DEFAULT 0,
       sold BOOLEAN DEFAULT 0
     )`,
