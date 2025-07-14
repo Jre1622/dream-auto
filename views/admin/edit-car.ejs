@@ -213,213 +213,152 @@
     </div>
 
     <script>
-        // Form submission debugging
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM Content Loaded - Starting form debugging');
-            
-            const form = document.querySelector('form[method="POST"]');
-            const submitButton = document.querySelector('button[type="submit"]');
-            
-            console.log('Form found:', !!form);
-            console.log('Submit button found:', !!submitButton);
-            
-            if (form && submitButton) {
-                console.log('Adding event listeners to form and button');
-                // Add submit listener for validation debugging
-                form.addEventListener('submit', function(e) {
-                    if (!form.checkValidity()) {
-                        console.log('Form invalid - preventing submission');
-                        console.log('Invalid fields:', Array.from(form.elements).filter(el => !el.checkValidity()).map(el => ({name: el.name, validationMessage: el.validationMessage})));
-                        form.reportValidity();
-                        e.preventDefault();
+            // Image preview functionality
+            const imagesInput = document.getElementById('images');
+            if (imagesInput) {
+                imagesInput.addEventListener('change', function(e) {
+                    const files = e.target.files;
+                    const previewContainer = document.getElementById('imagePreview');
+                    
+                    // Clear previous previews
+                    previewContainer.innerHTML = '';
+                    
+                    if (files.length === 0) {
+                        previewContainer.classList.add('hidden');
                         return;
                     }
-                    console.log('Form valid - submitting');
-                });
-                
-                // Removed custom click handler to allow native submission
-                
-                // Removed debugging submit handler to restore normal submission
-                
-                // Add additional debugging for button interactions
-                submitButton.addEventListener('mousedown', function(e) {
-                    console.log('Button mousedown event');
-                });
-                
-                submitButton.addEventListener('mouseup', function(e) {
-                    console.log('Button mouseup event');
-                });
-                
-                // Check if button is actually clickable
-                console.log('Button initial state:');
-                console.log('- Disabled:', submitButton.disabled);
-                console.log('- Pointer events:', window.getComputedStyle(submitButton).pointerEvents);
-                console.log('- Z-index:', window.getComputedStyle(submitButton).zIndex);
-                console.log('- Position:', window.getComputedStyle(submitButton).position);
-            } else {
-                console.error('Form or submit button not found!');
-                if (!form) console.error('Form element missing');
-                if (!submitButton) console.error('Submit button element missing');
-            }
-        });
-        
-        // Add global error handler
-        window.addEventListener('error', function(e) {
-            console.error('JavaScript error:', e.error);
-            console.error('Error message:', e.message);
-            console.error('Error source:', e.filename + ':' + e.lineno);
-        });
-        
-        // Global click listener for debugging
-        document.addEventListener('click', function(e) {
-            console.log('Global click captured on:', e.target);
-            console.log('Target tag:', e.target.tagName);
-            console.log('Target class:', e.target.className);
-            console.log('Target id:', e.target.id);
-            console.log('Event phase:', e.eventPhase);
-        }, true); // Capture phase
-        
-        // Image preview functionality
-        document.getElementById('images').addEventListener('change', function(e) {
-            const files = e.target.files;
-            const previewContainer = document.getElementById('imagePreview');
-            
-            // Clear previous previews
-            previewContainer.innerHTML = '';
-            
-            if (files.length === 0) {
-                previewContainer.classList.add('hidden');
-                return;
-            }
-            
-            previewContainer.classList.remove('hidden');
-            
-            Array.from(files).forEach((file, index) => {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    const previewDiv = document.createElement('div');
-                    previewDiv.className = 'relative';
                     
-                    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                    previewContainer.classList.remove('hidden');
                     
-                    previewDiv.innerHTML = `
-                        <img src="${e.target.result}" alt="Preview" 
-                             class="w-full h-32 object-cover rounded-lg border border-gray-300">
-                        <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
-                            New #${index + 1}
-                        </div>
-                        <div class="absolute bottom-2 left-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
-                            ${sizeInMB}MB
-                        </div>
-                    `;
-                    
-                    previewContainer.appendChild(previewDiv);
-                };
-                
-                reader.readAsDataURL(file);
-            });
-        });
-        
-        // Drag and drop functionality for image reordering
-        const imageContainer = document.getElementById('imageContainer');
-        if (imageContainer) {
-            let draggedElement = null;
-            
-            // Add event listeners to all draggable image elements
-            const imageElements = imageContainer.querySelectorAll('[draggable="true"]');
-            
-            imageElements.forEach(element => {
-                element.addEventListener('dragstart', function(e) {
-                    draggedElement = this;
-                    this.style.opacity = '0.5';
-                    e.dataTransfer.effectAllowed = 'move';
-                });
-                
-                element.addEventListener('dragend', function(e) {
-                    this.style.opacity = '1';
-                    draggedElement = null;
-                });
-                
-                element.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = 'move';
-                });
-                
-                element.addEventListener('drop', function(e) {
-                    e.preventDefault();
-                    if (draggedElement && draggedElement !== this) {
-                        // Get all image elements
-                        const allImages = Array.from(imageContainer.children);
-                        const draggedIndex = allImages.indexOf(draggedElement);
-                        const targetIndex = allImages.indexOf(this);
+                    Array.from(files).forEach((file, index) => {
+                        const reader = new FileReader();
                         
-                        // Reorder in DOM
-                        if (draggedIndex < targetIndex) {
-                            this.parentNode.insertBefore(draggedElement, this.nextSibling);
-                        } else {
-                            this.parentNode.insertBefore(draggedElement, this);
+                        reader.onload = function(e) {
+                            const previewDiv = document.createElement('div');
+                            previewDiv.className = 'relative';
+                            
+                            const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                            
+                            previewDiv.innerHTML = `
+                                <img src="${e.target.result}" alt="Preview" 
+                                     class="w-full h-32 object-cover rounded-lg border border-gray-300">
+                                <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                                    New #${index + 1}
+                                </div>
+                                <div class="absolute bottom-2 left-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+                                    ${sizeInMB}MB
+                                </div>
+                            `;
+                            
+                            previewContainer.appendChild(previewDiv);
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    });
+                });
+            }
+
+            // Drag and drop functionality for image reordering
+            const imageContainer = document.getElementById('imageContainer');
+            if (imageContainer) {
+                let draggedElement = null;
+                
+                // Add event listeners to all draggable image elements
+                const imageElements = imageContainer.querySelectorAll('[draggable="true"]');
+                
+                imageElements.forEach(element => {
+                    element.addEventListener('dragstart', function(e) {
+                        draggedElement = this;
+                        this.style.opacity = '0.5';
+                        e.dataTransfer.effectAllowed = 'move';
+                    });
+                    
+                    element.addEventListener('dragend', function(e) {
+                        this.style.opacity = '1';
+                        draggedElement = null;
+                    });
+                    
+                    element.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                    });
+                    
+                    element.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        if (draggedElement && draggedElement !== this) {
+                            // Get all image elements
+                            const allImages = Array.from(imageContainer.children);
+                            const draggedIndex = allImages.indexOf(draggedElement);
+                            const targetIndex = allImages.indexOf(this);
+                            
+                            // Reorder in DOM
+                            if (draggedIndex < targetIndex) {
+                                this.parentNode.insertBefore(draggedElement, this.nextSibling);
+                            } else {
+                                this.parentNode.insertBefore(draggedElement, this);
+                            }
+                            
+                            // Update display order in backend
+                            updateImageOrder();
                         }
-                        
-                        // Update display order in backend
-                        updateImageOrder();
-                    }
-                });
-            });
-            
-            function updateImageOrder() {
-                const imageElements = imageContainer.querySelectorAll('[data-image-id]');
-                const updates = [];
-                
-                imageElements.forEach((element, index) => {
-                    const imageId = element.getAttribute('data-image-id');
-                    updates.push({
-                        imageId: imageId,
-                        displayOrder: index + 1
                     });
                 });
                 
-                // Send batch update to server
-                fetch('/admin/update-images-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ updates: updates })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log('Image order updated successfully');
-                        // Update display order badges
-                        updateDisplayOrderBadges();
-                    } else {
-                        console.error('Failed to update image order');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating image order:', error);
-                });
-            }
-            
-            function updateDisplayOrderBadges() {
-                const imageElements = imageContainer.querySelectorAll('[data-image-id]');
-                imageElements.forEach((element, index) => {
-                    const badge = element.querySelector('.absolute.top-2.left-2 > div, .bg-gray-600, .bg-green-600');
-                    if (badge) {
-                        if (index === 0) {
-                            // First image becomes primary
-                            badge.className = 'absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded';
-                            badge.innerHTML = '<i class="fas fa-star"></i> Primary';
+                function updateImageOrder() {
+                    const imageElements = imageContainer.querySelectorAll('[data-image-id]');
+                    const updates = [];
+                    
+                    imageElements.forEach((element, index) => {
+                        const imageId = element.getAttribute('data-image-id');
+                        updates.push({
+                            imageId: imageId,
+                            displayOrder: index + 1
+                        });
+                    });
+                    
+                    // Send batch update to server
+                    fetch('/admin/update-images-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ updates: updates })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Image order updated successfully');
+                            // Update display order badges
+                            updateDisplayOrderBadges();
                         } else {
-                            // Other images show order number
-                            badge.className = 'absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded';
-                            badge.textContent = `#${index + 1}`;
+                            console.error('Failed to update image order');
                         }
-                    }
-                });
+                    })
+                    .catch(error => {
+                        console.error('Error updating image order:', error);
+                    });
+                }
+                
+                function updateDisplayOrderBadges() {
+                    const imageElements = imageContainer.querySelectorAll('[data-image-id]');
+                    imageElements.forEach((element, index) => {
+                        const badge = element.querySelector('.absolute.top-2.left-2 > div, .bg-gray-600, .bg-green-600');
+                        if (badge) {
+                            if (index === 0) {
+                                // First image becomes primary
+                                badge.className = 'absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded';
+                                badge.innerHTML = '<i class="fas fa-star"></i> Primary';
+                            } else {
+                                // Other images show order number
+                                badge.className = 'absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded';
+                                badge.textContent = `#${index + 1}`;
+                            }
+                        }
+                    });
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>
