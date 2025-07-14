@@ -7,6 +7,10 @@ const inventoryRouter = require('./routes/inventory');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+
+// Trust the first proxy
+app.set('trust proxy', 1);
+
 // Set EJS as the view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
