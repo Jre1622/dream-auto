@@ -2,7 +2,6 @@ const express = require("express");
 const path = require("path");
 require("dotenv").config();
 const db = require("./db/database");
-const { getCarImages } = require('./utils/imageUpload');
 const adminRouter = require('./routes/admin');
 const inventoryRouter = require('./routes/inventory');
 const app = express();
@@ -28,27 +27,39 @@ app.use('/inventory', inventoryRouter);
 // Routes
 app.get("/", async (req, res) => {
   try {
-    // Get featured cars that are not sold, limit to 6
-    const featuredCars = await new Promise((resolve, reject) => {
-      db.all("SELECT * FROM cars WHERE is_featured = 1 AND sold = 0 ORDER BY id DESC LIMIT 6", [], (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
+    // Optimized query: Get featured cars with their primary images in a single JOIN query
+    const featuredCarsWithImages = await new Promise((resolve, reject) => {
+      const query = `
+        SELECT 
+          c.*,
+          COALESCE(ci.image_url, '/images/placeholder-car.svg') as primary_image_url
+        FROM cars c
+        LEFT JOIN (
+          SELECT 
+            car_id,
+            image_url,
+            ROW_NUMBER() OVER (PARTITION BY car_id ORDER BY is_primary DESC, display_order ASC, id ASC) as rn
+          FROM car_images
+        ) ci ON c.id = ci.car_id AND ci.rn = 1
+        WHERE c.is_featured = 1 AND c.sold = 0
+        ORDER BY c.id DESC
+        LIMIT 6
+      `;
+      
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          console.error('Database error fetching featured cars:', err.message);
+          reject(err);
+        } else {
+          console.log(`Successfully fetched ${rows.length} featured cars`);
+          resolve(rows);
+        }
       });
     });
 
-    // Get primary image for each featured car
-    const featuredCarsWithImages = await Promise.all(featuredCars.map(async (car) => {
-      const images = await getCarImages(car.id);
-      const primaryImage = images.find(img => img.is_primary) || images[0];
-      return {
-        ...car,
-        primary_image_url: primaryImage ? primaryImage.image_url : '/images/placeholder-car.svg'
-      };
-    }));
-
     res.render("index", { featuredCars: featuredCarsWithImages });
   } catch (err) {
-    console.error('Error fetching featured cars:', err);
+    console.error('Error in index route:', err.message);
     res.render("index", { featuredCars: [] });
   }
 });

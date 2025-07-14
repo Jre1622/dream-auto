@@ -75,18 +75,24 @@
       </section>
 
       <% if (featuredCars && featuredCars.length > 0) { %>
-      <section id="inventory" class="py-16">
+      <section id="featured-cars" class="py-16" aria-labelledby="featured-cars-heading">
         <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-12">Featured Cars</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <h2 id="featured-cars-heading" class="text-3xl font-bold text-center mb-12">Featured Cars</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list" aria-label="Featured vehicles for sale">
             <% featuredCars.forEach(car => { %>
-            <a href="/inventory/<%= car.id %>" class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
+             <article role="listitem" class="featured-car-card">
+               <a href="/inventory/<%= car.id %>" 
+                  class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 block"
+                  aria-label="View details for <%= car.title %> - $<%= car.price.toLocaleString() %>">
               <div class="relative">
-                <img src="<%= car.primary_image_url %>" alt="<%= car.title %>" class="w-full h-48 object-cover">
-                <div class="absolute top-2 right-2 bg-primary-600 text-white px-2 py-1 rounded text-sm font-semibold">
-                  Featured
-                </div>
-              </div>
+                 <img src="<%= car.primary_image_url %>" 
+                      alt="<%= car.title %> - Featured Car at Dream Auto" 
+                      class="w-full h-48 object-cover"
+                      onerror="this.src='/images/placeholder-car.svg'; this.onerror=null;">
+                 <div class="absolute top-2 right-2 bg-primary-600 text-white px-2 py-1 rounded text-sm font-semibold">
+                   Featured
+                 </div>
+               </div>
               <div class="p-6">
                 <h3 class="text-xl font-bold text-gray-900 mb-2"><%= car.title %></h3>
                 <div class="flex justify-between items-center mb-3">
@@ -99,7 +105,8 @@
                 </div>
               </div>
             </a>
-            <% }); %>
+             </article>
+             <% }); %>
           </div>
           
           <!-- View All Inventory Button -->
