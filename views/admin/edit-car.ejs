@@ -215,10 +215,16 @@
     <script>
         // Form submission debugging
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded - Starting form debugging');
+            
             const form = document.querySelector('form[method="POST"]');
             const submitButton = document.querySelector('button[type="submit"]');
             
+            console.log('Form found:', !!form);
+            console.log('Submit button found:', !!submitButton);
+            
             if (form && submitButton) {
+                console.log('Adding event listeners to form and button');
                 // Add form submission event listener
                 form.addEventListener('submit', function(e) {
                     console.log('Form submission started');
@@ -249,7 +255,18 @@
                     
                     console.log('Form is valid, submitting...');
                 });
+            } else {
+                console.error('Form or submit button not found!');
+                if (!form) console.error('Form element missing');
+                if (!submitButton) console.error('Submit button element missing');
             }
+        });
+        
+        // Add global error handler
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript error:', e.error);
+            console.error('Error message:', e.message);
+            console.error('Error source:', e.filename + ':' + e.lineno);
         });
         
         // Image preview functionality
