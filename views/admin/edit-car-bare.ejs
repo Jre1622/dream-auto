@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Car Bare</title>
+  </head>
+  <body>
+    <h1>Edit Car Bare</h1>
+
+    <% if (success) { %>
+    <p style="color: green"><%= success %></p>
+    <% } %> <% if (error) { %>
+    <p style="color: red"><%= error %></p>
+    <% } %>
+
+    <form method="POST" action="/admin/edit-car/<%= car.id %>" enctype="multipart/form-data">
+      <label for="title">Car Title *</label>
+      <input type="text" id="title" name="title" required value="<%= car.title %>" /><br /><br />
+
+      <label for="price">Price ($) *</label>
+      <input type="number" id="price" name="price" required min="0" value="<%= car.price %>" /><br /><br />
+
+      <label for="year">Year *</label>
+      <input type="number" id="year" name="year" required min="1900" max="2030" value="<%= car.year %>" /><br /><br />
+
+      <label for="make">Make *</label>
+      <input type="text" id="make" name="make" required value="<%= car.make %>" /><br /><br />
+
+      <label for="model">Model *</label>
+      <input type="text" id="model" name="model" required value="<%= car.model %>" /><br /><br />
+
+      <label for="mileage">Mileage *</label>
+      <input type="number" id="mileage" name="mileage" required min="0" value="<%= car.mileage %>" /><br /><br />
+
+      <label for="vin">VIN *</label>
+      <input type="text" id="vin" name="vin" required value="<%= car.vin %>" /><br /><br />
+
+      <label for="is_featured">Featured Car</label>
+      <input type="checkbox" id="is_featured" name="is_featured" value="1" <%= car.is_featured ? 'checked' : '' %>><br /><br />
+
+      <label for="sold">Mark as Sold</label>
+      <input type="checkbox" id="sold" name="sold" value="1" <%= car.sold ? 'checked' : '' %>><br /><br />
+
+      <button type="submit">Update Car</button>
+    </form>
+  </body>
+</html>
