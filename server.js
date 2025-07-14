@@ -2,14 +2,13 @@ const express = require("express");
 const path = require("path");
 require("dotenv").config();
 const db = require("./db/database");
-const adminRouter = require('./routes/admin');
-const inventoryRouter = require('./routes/inventory');
+const adminRouter = require("./routes/admin");
+const inventoryRouter = require("./routes/inventory");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
 // Trust the first proxy
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 // Set EJS as the view engine
 app.set("view engine", "ejs");
@@ -20,9 +19,12 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Make dealership phone number available to all templates
+app.locals.dealershipPhone = process.env.DEALERSHIP_PHONE;
+
 // Mount routers
-app.use('/admin', adminRouter);
-app.use('/inventory', inventoryRouter);
+app.use("/admin", adminRouter);
+app.use("/inventory", inventoryRouter);
 
 // Routes
 app.get("/", async (req, res) => {
@@ -45,10 +47,10 @@ app.get("/", async (req, res) => {
         ORDER BY c.id DESC
         LIMIT 6
       `;
-      
+
       db.all(query, [], (err, rows) => {
         if (err) {
-          console.error('Database error fetching featured cars:', err.message);
+          console.error("Database error fetching featured cars:", err.message);
           reject(err);
         } else {
           console.log(`Successfully fetched ${rows.length} featured cars`);
@@ -59,7 +61,7 @@ app.get("/", async (req, res) => {
 
     res.render("index", { featuredCars: featuredCarsWithImages });
   } catch (err) {
-    console.error('Error in index route:', err.message);
+    console.error("Error in index route:", err.message);
     res.render("index", { featuredCars: [] });
   }
 });
