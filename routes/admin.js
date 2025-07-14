@@ -9,8 +9,8 @@ const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 20 * 1024 * 1024, // 20MB limit - Increased for high-quality car photos
-    files: 20 // Maximum 20 files - Typical for car dealership inventory
+    fileSize: 20 * 1024 * 1024, // 20MB limit 
+    files: 20 // Maximum 20 files 
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -291,34 +291,7 @@ router.post("/delete-image/:imageId", basicAuth, async (req, res) => {
   }
 });
 
-// Set Primary Image
-router.post("/set-primary-image/:imageId", basicAuth, async (req, res) => {
-  const imageId = req.params.imageId;
-  const carId = req.body.carId;
-  
-  try {
-    // First, remove primary status from all images for this car
-    await new Promise((resolve, reject) => {
-      db.run('UPDATE car_images SET is_primary = 0 WHERE car_id = ?', [carId], (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
-    
-    // Then set the selected image as primary
-    await new Promise((resolve, reject) => {
-      db.run('UPDATE car_images SET is_primary = 1 WHERE id = ?', [imageId], (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
-    
-    res.redirect(`/admin/edit-car/${carId}?success=Primary image updated`);
-  } catch (err) {
-    console.error(err);
-    res.redirect(`/admin/edit-car/${carId}?error=Error setting primary image`);
-  }
-});
+// Note: Set Primary Image functionality removed - first image (display_order=1) is automatically primary
 
 // POST /admin/update-image-order/:imageId - Update image display order
 router.post('/update-image-order/:imageId', (req, res) => {
@@ -353,11 +326,12 @@ router.post('/update-images-order', (req, res) => {
     return res.status(400).json({ error: 'Updates array is required' });
   }
   
-  // Prepare batch update
+  // Prepare batch update with automatic primary flag management
   const updatePromises = updates.map(update => {
     return new Promise((resolve, reject) => {
-      const query = 'UPDATE car_images SET display_order = ? WHERE id = ?';
-      db.run(query, [parseInt(update.displayOrder), update.imageId], function(err) {
+      const isPrimary = parseInt(update.displayOrder) === 1;
+      const query = 'UPDATE car_images SET display_order = ?, is_primary = ? WHERE id = ?';
+      db.run(query, [parseInt(update.displayOrder), isPrimary, update.imageId], function(err) {
         if (err) {
           reject(err);
         } else {

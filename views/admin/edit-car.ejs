@@ -126,7 +126,7 @@
                 <% if (images && images.length > 0) { %>
                 <div class="space-y-4">
                     <h3 class="text-lg font-medium text-gray-800">Current Images</h3>
-                    <p class="text-sm text-gray-600">💡 Drag and drop images to reorder them. The first image will be the primary image shown on listings.</p>
+                    <p class="text-sm text-gray-600">💡 Drag and drop images to reorder them. The first image automatically becomes the primary image shown on listings.</p>
                     <div id="imageContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <% images.forEach(function(image) { %>
                         <div class="relative group cursor-move" draggable="true" data-image-id="<%= image.id %>">
@@ -134,9 +134,9 @@
                                  class="w-full h-32 object-cover rounded-lg border border-gray-300 transition-all duration-200">
                             
                             <!-- Primary badge -->
-                            <% if (image.is_primary) { %>
+                            <% if (image.display_order === 1) { %>
                             <div class="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
-                                Primary
+                                <i class="fas fa-star"></i> Primary
                             </div>
                             <% } else { %>
                             <div class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded">
@@ -146,14 +146,6 @@
                             
                             <!-- Action buttons -->
                             <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity space-x-1">
-                                <% if (!image.is_primary) { %>
-                                <form method="POST" action="/admin/set-primary-image/<%= image.id %>" class="inline">
-                                    <input type="hidden" name="carId" value="<%= car.id %>">
-                                    <button type="submit" class="bg-blue-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700">
-                                        Set Primary
-                                    </button>
-                                </form>
-                                <% } %>
                                 <form method="POST" action="/admin/delete-image/<%= image.id %>" class="inline" 
                                       onsubmit="return confirm('Are you sure you want to delete this image?')">
                                     <input type="hidden" name="carId" value="<%= car.id %>">
@@ -348,9 +340,17 @@
             function updateDisplayOrderBadges() {
                 const imageElements = imageContainer.querySelectorAll('[data-image-id]');
                 imageElements.forEach((element, index) => {
-                    const badge = element.querySelector('.bg-gray-600');
+                    const badge = element.querySelector('.absolute.top-2.left-2 > div, .bg-gray-600, .bg-green-600');
                     if (badge) {
-                        badge.textContent = `#${index + 1}`;
+                        if (index === 0) {
+                            // First image becomes primary
+                            badge.className = 'absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded';
+                            badge.innerHTML = '<i class="fas fa-star"></i> Primary';
+                        } else {
+                            // Other images show order number
+                            badge.className = 'absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded';
+                            badge.textContent = `#${index + 1}`;
+                        }
                     }
                 });
             }

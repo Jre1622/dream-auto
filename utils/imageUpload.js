@@ -97,10 +97,16 @@ async function uploadCarImages(files, carId) {
     totalUploaded: 0
   };
 
+  // Get existing images to determine starting display order
+  const existingImages = await getCarImages(carId);
+  const startingDisplayOrder = existingImages.length + 1;
+  const hasExistingImages = existingImages.length > 0;
+
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
-    const displayOrder = i + 1;
-    const isPrimary = i === 0; // First image is primary by default
+    const displayOrder = startingDisplayOrder + i;
+    // Only set as primary if this is the first image overall (no existing images) and it's the first file
+    const isPrimary = !hasExistingImages && i === 0;
 
     try {
       // Upload to R2
