@@ -245,18 +245,44 @@
                 // Add click event listener to submit button
                 submitButton.addEventListener('click', function(e) {
                     console.log('Submit button clicked');
-                    console.log('Button disabled state:', submitButton.disabled);
-                    console.log('Button computed style:', window.getComputedStyle(submitButton));
+                    console.log('Event timestamp:', e.timeStamp);
+                    console.log('Event target:', e.target);
                     
-                    // Check form validity
-                    if (!form.checkValidity()) {
-                        console.log('Form validation failed');
-                        form.reportValidity();
-                        e.preventDefault();
-                        return;
+                    try {
+                        if (!form.checkValidity()) {
+                            console.log('Invalid fields:', 
+                                Array.from(form.elements)
+                                    .filter(el => !el.checkValidity())
+                                    .map(el => el.name)
+                            );
+                            form.reportValidity();
+                            e.preventDefault();
+                            return;
+                        }
+                        
+                        console.log('All form fields valid');
+                        console.log('Form submission proceeding...');
+                    } catch (error) {
+                        console.error('Form validation error:', error);
                     }
+                });
+                
+                // Add form submit handler as fallback
+                form.addEventListener('submit', function(e) {
+                    console.log('Form submit event triggered');
+                    e.preventDefault();
+                    console.log('Submission intercepted - would normally submit now');
                     
-                    console.log('Form is valid, submitting...');
+                    // Simulate form submission
+                    const formData = new FormData(form);
+                    console.log('Form data:', Object.fromEntries(formData));
+                    
+                    fetch(window.location.href, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => console.log('Server response:', response.status))
+                    .catch(error => console.error('Submission error:', error));
                 });
                 
                 // Add additional debugging for button interactions
