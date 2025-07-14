@@ -225,47 +225,19 @@
             
             if (form && submitButton) {
                 console.log('Adding event listeners to form and button');
-                // Add form submission event listener
+                // Add submit listener for validation debugging
                 form.addEventListener('submit', function(e) {
-                    console.log('Form submission started');
-                    console.log('Form action:', form.action);
-                    console.log('Form method:', form.method);
-                    
-                    // Disable submit button to prevent double submission
-                    submitButton.disabled = true;
-                    submitButton.textContent = 'Updating...';
-                    
-                    // Re-enable button after 5 seconds in case of error
-                    setTimeout(() => {
-                        submitButton.disabled = false;
-                        submitButton.textContent = 'Update Car';
-                    }, 5000);
+                    if (!form.checkValidity()) {
+                        console.log('Form invalid - preventing submission');
+                        console.log('Invalid fields:', Array.from(form.elements).filter(el => !el.checkValidity()).map(el => ({name: el.name, validationMessage: el.validationMessage})));
+                        form.reportValidity();
+                        e.preventDefault();
+                        return;
+                    }
+                    console.log('Form valid - submitting');
                 });
                 
-                // Add click event listener to submit button
-                submitButton.addEventListener('click', function(e) {
-                    console.log('Submit button clicked');
-                    console.log('Event timestamp:', e.timeStamp);
-                    console.log('Event target:', e.target);
-                    
-                    try {
-                        if (!form.checkValidity()) {
-                            console.log('Invalid fields:', 
-                                Array.from(form.elements)
-                                    .filter(el => !el.checkValidity())
-                                    .map(el => el.name)
-                            );
-                            form.reportValidity();
-                            e.preventDefault();
-                            return;
-                        }
-                        
-                        console.log('All form fields valid');
-                        console.log('Form submission proceeding...');
-                    } catch (error) {
-                        console.error('Form validation error:', error);
-                    }
-                });
+                // Removed custom click handler to allow native submission
                 
                 // Removed debugging submit handler to restore normal submission
                 
