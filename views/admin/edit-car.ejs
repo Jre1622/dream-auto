@@ -314,6 +314,15 @@
             console.error('Error source:', e.filename + ':' + e.lineno);
         });
         
+        // Global click listener for debugging
+        document.addEventListener('click', function(e) {
+            console.log('Global click captured on:', e.target);
+            console.log('Target tag:', e.target.tagName);
+            console.log('Target class:', e.target.className);
+            console.log('Target id:', e.target.id);
+            console.log('Event phase:', e.eventPhase);
+        }, true); // Capture phase
+        
         // Image preview functionality
         document.getElementById('images').addEventListener('change', function(e) {
             const files = e.target.files;
