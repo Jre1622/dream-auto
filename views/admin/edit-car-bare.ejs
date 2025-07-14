@@ -122,6 +122,22 @@
                               placeholder="List key features separated by commas"><%= car.features || '' %></textarea>
                 </div>
 
+                <!-- Current Images -->
+                <% if (images && images.length > 0) { %>
+                <div class="space-y-4">
+                    <h3 class="text-lg font-medium text-gray-800">Current Images</h3>
+                    <p class="text-sm text-gray-600">💡 Drag and drop images to reorder them. The first image automatically becomes the primary image shown on listings.</p>
+                    <div id="imageContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <% images.forEach(function(image) { %>
+                        <div class="relative group cursor-move" draggable="true" data-image-id="<%= image.id %>">
+                            <img src="<%= image.image_url %>" alt="Car image" 
+                                 class="w-full h-32 object-cover rounded-lg border border-gray-300 transition-all duration-200">
+                        </div>
+                        <% }); %>
+                    </div>
+                </div>
+                <% } %>
+
                 <!-- Options -->
                 <div class="flex items-center space-x-6">
                     <label class="flex items-center">
