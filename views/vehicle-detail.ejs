@@ -315,8 +315,16 @@
             const currentIndexSpan = document.getElementById('currentImageIndex');
             const totalImagesSpan = document.getElementById('totalImages');
             
-            let currentImageIndex = 0;
             const images = Array.from(thumbnails).map(thumb => thumb.dataset.image);
+            
+            // Find the primary image index (look for thumbnail with star indicator)
+            let currentImageIndex = 0;
+            <% if (images && images.length > 0) { %>
+                <% const primaryImageIndex = images.findIndex(img => img.is_primary); %>
+                <% if (primaryImageIndex >= 0) { %>
+                    currentImageIndex = <%= primaryImageIndex %>;
+                <% } %>
+            <% } %>
             
             // Update total images count
             totalImagesSpan.textContent = images.length;
@@ -338,6 +346,11 @@
                         }
                     });
                 }
+            }
+            
+            // Initialize slideshow at primary image position
+            if (images.length > 0) {
+                updateMainImage(currentImageIndex);
             }
             
             // Thumbnail click handlers

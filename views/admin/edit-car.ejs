@@ -126,11 +126,12 @@
                 <% if (images && images.length > 0) { %>
                 <div class="space-y-4">
                     <h3 class="text-lg font-medium text-gray-800">Current Images</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <p class="text-sm text-gray-600">💡 Drag and drop images to reorder them. The first image will be the primary image shown on listings.</p>
+                    <div id="imageContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <% images.forEach(function(image) { %>
-                        <div class="relative group">
+                        <div class="relative group cursor-move" draggable="true" data-image-id="<%= image.id %>">
                             <img src="<%= image.image_url %>" alt="Car image" 
-                                 class="w-full h-32 object-cover rounded-lg border border-gray-300">
+                                 class="w-full h-32 object-cover rounded-lg border border-gray-300 transition-all duration-200">
                             
                             <!-- Primary badge -->
                             <% if (image.is_primary) { %>
@@ -262,6 +263,98 @@
                 reader.readAsDataURL(file);
             });
         });
+        
+        // Drag and drop functionality for image reordering
+        const imageContainer = document.getElementById('imageContainer');
+        if (imageContainer) {
+            let draggedElement = null;
+            
+            // Add event listeners to all draggable image elements
+            const imageElements = imageContainer.querySelectorAll('[draggable="true"]');
+            
+            imageElements.forEach(element => {
+                element.addEventListener('dragstart', function(e) {
+                    draggedElement = this;
+                    this.style.opacity = '0.5';
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                
+                element.addEventListener('dragend', function(e) {
+                    this.style.opacity = '1';
+                    draggedElement = null;
+                });
+                
+                element.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                });
+                
+                element.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    if (draggedElement && draggedElement !== this) {
+                        // Get all image elements
+                        const allImages = Array.from(imageContainer.children);
+                        const draggedIndex = allImages.indexOf(draggedElement);
+                        const targetIndex = allImages.indexOf(this);
+                        
+                        // Reorder in DOM
+                        if (draggedIndex < targetIndex) {
+                            this.parentNode.insertBefore(draggedElement, this.nextSibling);
+                        } else {
+                            this.parentNode.insertBefore(draggedElement, this);
+                        }
+                        
+                        // Update display order in backend
+                        updateImageOrder();
+                    }
+                });
+            });
+            
+            function updateImageOrder() {
+                const imageElements = imageContainer.querySelectorAll('[data-image-id]');
+                const updates = [];
+                
+                imageElements.forEach((element, index) => {
+                    const imageId = element.getAttribute('data-image-id');
+                    updates.push({
+                        imageId: imageId,
+                        displayOrder: index + 1
+                    });
+                });
+                
+                // Send batch update to server
+                fetch('/admin/update-images-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ updates: updates })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Image order updated successfully');
+                        // Update display order badges
+                        updateDisplayOrderBadges();
+                    } else {
+                        console.error('Failed to update image order');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating image order:', error);
+                });
+            }
+            
+            function updateDisplayOrderBadges() {
+                const imageElements = imageContainer.querySelectorAll('[data-image-id]');
+                imageElements.forEach((element, index) => {
+                    const badge = element.querySelector('.bg-gray-600');
+                    if (badge) {
+                        badge.textContent = `#${index + 1}`;
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>

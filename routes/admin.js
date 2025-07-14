@@ -320,4 +320,66 @@ router.post("/set-primary-image/:imageId", basicAuth, async (req, res) => {
   }
 });
 
+// POST /admin/update-image-order/:imageId - Update image display order
+router.post('/update-image-order/:imageId', (req, res) => {
+  const { imageId } = req.params;
+  const { displayOrder } = req.body;
+  
+  if (!displayOrder || isNaN(displayOrder)) {
+    return res.status(400).json({ error: 'Valid display order is required' });
+  }
+  
+  const query = 'UPDATE car_images SET display_order = ? WHERE id = ?';
+  
+  db.run(query, [parseInt(displayOrder), imageId], function(err) {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ error: 'Failed to update image order' });
+    }
+    
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+    
+    res.json({ success: true, message: 'Image order updated successfully' });
+  });
+});
+
+// POST /admin/update-images-order - Batch update image display orders
+router.post('/update-images-order', (req, res) => {
+  const { updates } = req.body;
+  
+  if (!updates || !Array.isArray(updates)) {
+    return res.status(400).json({ error: 'Updates array is required' });
+  }
+  
+  // Prepare batch update
+  const updatePromises = updates.map(update => {
+    return new Promise((resolve, reject) => {
+      const query = 'UPDATE car_images SET display_order = ? WHERE id = ?';
+      db.run(query, [parseInt(update.displayOrder), update.imageId], function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.changes);
+        }
+      });
+    });
+  });
+  
+  Promise.all(updatePromises)
+    .then(results => {
+      const totalUpdated = results.reduce((sum, changes) => sum + changes, 0);
+      res.json({ 
+        success: true, 
+        message: `Updated ${totalUpdated} image(s) successfully`,
+        updatedCount: totalUpdated
+      });
+    })
+    .catch(err => {
+      console.error('Batch update error:', err);
+      res.status(500).json({ error: 'Failed to update image orders' });
+    });
+});
+
 module.exports = router;
