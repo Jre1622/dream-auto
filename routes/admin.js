@@ -167,6 +167,10 @@ router.get("/edit-car/:id", basicAuth, async (req, res) => {
 // Edit Car - POST form with image upload
 router.post("/edit-car/:id", basicAuth, upload.array('images', 20), async (req, res) => {
   const carId = req.params.id;
+  console.log('Edit car POST request received for car ID:', carId);
+  console.log('Request body:', req.body);
+  console.log('Files uploaded:', req.files ? req.files.length : 0);
+  
   const {
     title, year, make, model, price, mileage, vin, engine, transmission,
     features, carfax_url, is_featured, sold
@@ -184,12 +188,17 @@ router.post("/edit-car/:id", basicAuth, upload.array('images', 20), async (req, 
   ];
 
   try {
+    console.log('Attempting to update car with SQL:', sql);
+    console.log('Parameters:', params);
+    
     // Update car details
     await new Promise((resolve, reject) => {
       db.run(sql, params, function(err) {
         if (err) {
+          console.error('Database update error:', err);
           reject(err);
         } else {
+          console.log('Car updated successfully, changes:', this.changes);
           resolve();
         }
       });

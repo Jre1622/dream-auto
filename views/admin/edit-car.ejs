@@ -213,6 +213,45 @@
     </div>
 
     <script>
+        // Form submission debugging
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[method="POST"]');
+            const submitButton = document.querySelector('button[type="submit"]');
+            
+            if (form && submitButton) {
+                // Add form submission event listener
+                form.addEventListener('submit', function(e) {
+                    console.log('Form submission started');
+                    console.log('Form action:', form.action);
+                    console.log('Form method:', form.method);
+                    
+                    // Disable submit button to prevent double submission
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Updating...';
+                    
+                    // Re-enable button after 5 seconds in case of error
+                    setTimeout(() => {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Update Car';
+                    }, 5000);
+                });
+                
+                // Add click event listener to submit button
+                submitButton.addEventListener('click', function(e) {
+                    console.log('Submit button clicked');
+                    
+                    // Check form validity
+                    if (!form.checkValidity()) {
+                        console.log('Form validation failed');
+                        form.reportValidity();
+                        return;
+                    }
+                    
+                    console.log('Form is valid, submitting...');
+                });
+            }
+        });
+        
         // Image preview functionality
         document.getElementById('images').addEventListener('change', function(e) {
             const files = e.target.files;
