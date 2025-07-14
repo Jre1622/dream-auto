@@ -267,23 +267,7 @@
                     }
                 });
                 
-                // Add form submit handler as fallback
-                form.addEventListener('submit', function(e) {
-                    console.log('Form submit event triggered');
-                    e.preventDefault();
-                    console.log('Submission intercepted - would normally submit now');
-                    
-                    // Simulate form submission
-                    const formData = new FormData(form);
-                    console.log('Form data:', Object.fromEntries(formData));
-                    
-                    fetch(window.location.href, {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => console.log('Server response:', response.status))
-                    .catch(error => console.error('Submission error:', error));
-                });
+                // Removed debugging submit handler to restore normal submission
                 
                 // Add additional debugging for button interactions
                 submitButton.addEventListener('mousedown', function(e) {
