@@ -74,37 +74,43 @@
         </div>
       </section>
 
+      <% if (featuredCars && featuredCars.length > 0) { %>
       <section id="inventory" class="py-16">
         <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-12">Our Inventory</h2>
+          <h2 class="text-3xl font-bold text-center mb-12">Featured Cars</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Placeholder Car 1 -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div class="w-full h-48 bg-gray-200"></div>
-              <div class="p-6">
-                <h3 class="text-xl font-bold">Placeholder Car</h3>
-                <p class="text-gray-600">Details about the car.</p>
+            <% featuredCars.forEach(car => { %>
+            <a href="/inventory/<%= car.id %>" class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
+              <div class="relative">
+                <img src="<%= car.primary_image_url %>" alt="<%= car.title %>" class="w-full h-48 object-cover">
+                <div class="absolute top-2 right-2 bg-primary-600 text-white px-2 py-1 rounded text-sm font-semibold">
+                  Featured
+                </div>
               </div>
-            </div>
-            <!-- Placeholder Car 2 -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div class="w-full h-48 bg-gray-200"></div>
               <div class="p-6">
-                <h3 class="text-xl font-bold">Placeholder Car</h3>
-                <p class="text-gray-600">Details about the car.</p>
+                <h3 class="text-xl font-bold text-gray-900 mb-2"><%= car.title %></h3>
+                <div class="flex justify-between items-center mb-3">
+                  <span class="text-2xl font-bold text-primary-600">$<%= car.price.toLocaleString() %></span>
+                  <span class="text-gray-600"><%= car.year %></span>
+                </div>
+                <div class="text-gray-600 text-sm">
+                  <p class="mb-1"><%= car.mileage.toLocaleString() %> miles</p>
+                  <p><%= car.make %> <%= car.model %></p>
+                </div>
               </div>
-            </div>
-            <!-- Placeholder Car 3 -->
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div class="w-full h-48 bg-gray-200"></div>
-              <div class="p-6">
-                <h3 class="text-xl font-bold">Placeholder Car</h3>
-                <p class="text-gray-600">Details about the car.</p>
-              </div>
-            </div>
+            </a>
+            <% }); %>
+          </div>
+          
+          <!-- View All Inventory Button -->
+          <div class="text-center mt-12">
+            <a href="/inventory" class="inline-block bg-primary-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-primary-700 transition transform hover:-translate-y-1">
+              View All Inventory
+            </a>
           </div>
         </div>
       </section>
+      <% } %>
 
       <!-- Location & Hours Section -->
       <section id="location" class="bg-gray-50 py-16">
