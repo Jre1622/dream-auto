@@ -132,6 +132,17 @@
                         <div class="relative group cursor-move" draggable="true" data-image-id="<%= image.id %>">
                             <img src="<%= image.image_url %>" alt="Car image" 
                                  class="w-full h-32 object-cover rounded-lg border border-gray-300 transition-all duration-200">
+                            
+                            <!-- Primary badge -->
+                            <% if (image.display_order === 1) { %>
+                            <div class="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                                <i class="fas fa-star"></i> Primary
+                            </div>
+                            <% } else { %>
+                            <div class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded">
+                                #<%= image.display_order %>
+                            </div>
+                            <% } %>
                         </div>
                         <% }); %>
                     </div>
