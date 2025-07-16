@@ -87,6 +87,9 @@ dream-auto/
 │   ├── financing.ejs      # Financing information page
 │   ├── index.ejs          # Homepage
 │   ├── inventory.ejs      # Inventory listing
+│   ├── calculator.ejs     # Payment calculator tool
+│   ├── inventory.ejs      # Inventory listing
+
 │   └── vehicle-detail.ejs # Individual vehicle page
 ├── .env                   # Environment variables
 ├── .gitignore            # Git ignore rules
