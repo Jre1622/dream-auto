@@ -27,7 +27,6 @@ DreamAutosMN@gmail.com
 ## Next Phase
 
     -Consider adding a top banner or something that uses logic to check the time and if we are there it has a nice green check mark or not if closed
-    -make sure to add the indexes on the database for where we query the inventory page
     - Change the heart in the inventory page to a call button icon which auto calls
     - Add a thing to the Vin Section so that is has the copy icon and when clicked or tapped auto copies
     - add a nice little thing or something in the inventory or featured if they have a carfax
