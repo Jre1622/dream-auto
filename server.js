@@ -66,6 +66,11 @@ app.get("/", async (req, res) => {
   }
 });
 
+// Calculator route
+app.get("/calculator", (req, res) => {
+  res.render("calculator");
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
