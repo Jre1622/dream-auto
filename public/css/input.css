@@ -156,6 +156,10 @@
   --breakpoint-3xl: 1920px;
 }
 
+.bg-cover {
+  @apply top-[-4rem];
+}
+
 /* Custom responsive fixes for very small screens */
 @media (max-width: 380px) {
   .container {
