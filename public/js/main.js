@@ -1,5 +1,3 @@
-// Dream Auto - Main JavaScript functionality
-
 // Typewriter effect for hero section
 class TypewriterEffect {
     constructor(element, phrases, speed = 100, deleteSpeed = 50, pauseTime = 2000) {

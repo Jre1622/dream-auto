@@ -30,3 +30,24 @@ DreamAutosMN@gmail.com
     - Change the heart in the inventory page to a call button icon which auto calls
     - Add a thing to the Vin Section so that is has the copy icon and when clicked or tapped auto copies
     - add a nice little thing or something in the inventory or featured if they have a carfax
+    - Still dont have a sitemap.xml
+    - still dont have a robots.txt 
+    - Need to add the JSON Schema for rich search results
+    - Need to add the Google search console
+    - Need to add the Bing Search Console
+    - Consider adding analytics
+    - Consider adding the financing page with embed bank locations and things
+    - Print laminated locations of banks and things
+    - Print laminated payment methods 
+        -> Cash APP
+        -> PayPal
+        -> Square
+        -> Zelle
+        -> Venmo
+        -> Stripe
+        -> Wire
+        -> ACH Info
+        -> Cash
+        -> Cashiers Check
+        -> Get dealer papers and things from Burnsville
+        

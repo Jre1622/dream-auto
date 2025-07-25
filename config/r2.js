@@ -1,5 +1,4 @@
 // Cloudflare R2 Configuration
-// You'll need to set these environment variables or update with your actual values
 
 const { S3Client } = require('@aws-sdk/client-s3');
 

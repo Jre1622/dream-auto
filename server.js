@@ -29,7 +29,7 @@ app.use("/inventory", inventoryRouter);
 // Routes
 app.get("/", async (req, res) => {
   try {
-    // Optimized query: Get featured cars with their primary images in a single JOIN query
+    // Get featured cars with their primary images 
     const featuredCarsWithImages = await new Promise((resolve, reject) => {
       const query = `
         SELECT 
@@ -66,7 +66,6 @@ app.get("/", async (req, res) => {
   }
 });
 
-// Calculator route
 app.get("/calculator", (req, res) => {
   res.render("calculator");
 });

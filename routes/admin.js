@@ -285,8 +285,6 @@ router.post("/delete-image/:imageId", basicAuth, async (req, res) => {
   }
 });
 
-// Note: Set Primary Image functionality removed - first image (display_order=1) is automatically primary
-
 // POST /admin/update-image-order/:imageId - Update image display order
 router.post("/update-image-order/:imageId", (req, res) => {
   const { imageId } = req.params;
