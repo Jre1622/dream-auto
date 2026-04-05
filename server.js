@@ -10,19 +10,51 @@ const inventoryRouter = require("./routes/inventory");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Launch Chrome once at startup (saves RAM, one process shared across all requests)
+// Launch Chrome once and reuse it across requests.
 let browser;
-(async () => {
-  try {
-    browser = await puppeteer.launch({
-      headless: "new",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"]
-    });
-    console.log("Puppeteer browser launched");
-  } catch (err) {
-    console.error("Failed to launch Puppeteer browser:", err.message);
+let browserPromise;
+
+async function getBrowser() {
+  if (browser?.isConnected()) {
+    return browser;
   }
-})();
+
+  if (browserPromise) {
+    return browserPromise;
+  }
+
+  browserPromise = puppeteer
+    .launch({
+      headless: "new",
+      timeout: 120000,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+      ],
+    })
+    .then((launchedBrowser) => {
+      browser = launchedBrowser;
+      browserPromise = null;
+      browser.on("disconnected", () => {
+        browser = undefined;
+      });
+      console.log("Puppeteer browser launched");
+      return browser;
+    })
+    .catch((err) => {
+      browser = undefined;
+      browserPromise = null;
+      console.error("Failed to launch Puppeteer browser:", err.message);
+      throw err;
+    });
+
+  return browserPromise;
+}
+
+// Warm the shared browser in the background, but let requests retry if launch is slow.
+getBrowser().catch(() => {});
 
 // Trust the first proxy
 app.set("trust proxy", 1);
@@ -208,10 +240,8 @@ app.post("/generate-contract", async (req, res) => {
     const filename = `${date}_${name}_${vehicle}.pdf`.replace(/_+/g, "_");
 
     // Generate PDF using shared browser instance
-    if (!browser) {
-      return res.status(500).send("PDF engine not ready. Try again in a moment.");
-    }
-    const page = await browser.newPage();
+    const activeBrowser = await getBrowser();
+    const page = await activeBrowser.newPage();
     await page.setContent(template, { waitUntil: "networkidle0" });
 
     const uniqueId = crypto.randomBytes(4).toString("hex");
