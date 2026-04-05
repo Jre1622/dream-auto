@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const crypto = require("crypto");
 const puppeteer = require("puppeteer");
 require("dotenv").config();
 const db = require("./db/database");
@@ -8,6 +9,20 @@ const adminRouter = require("./routes/admin");
 const inventoryRouter = require("./routes/inventory");
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Launch Chrome once at startup (saves RAM, one process shared across all requests)
+let browser;
+(async () => {
+  try {
+    browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    });
+    console.log("Puppeteer browser launched");
+  } catch (err) {
+    console.error("Failed to launch Puppeteer browser:", err.message);
+  }
+})();
 
 // Trust the first proxy
 app.set("trust proxy", 1);
@@ -192,12 +207,15 @@ app.post("/generate-contract", async (req, res) => {
     const vehicle = (data.year || "") + "_" + (data.make || "") + "_" + (data.model || "");
     const filename = `${date}_${name}_${vehicle}.pdf`.replace(/_+/g, "_");
 
-    // Generate PDF
-    const browser = await puppeteer.launch({ headless: "new" });
+    // Generate PDF using shared browser instance
+    if (!browser) {
+      return res.status(500).send("PDF engine not ready. Try again in a moment.");
+    }
     const page = await browser.newPage();
     await page.setContent(template, { waitUntil: "networkidle0" });
 
-    const tmpPath = path.join(__dirname, "tmp_" + filename);
+    const uniqueId = crypto.randomBytes(4).toString("hex");
+    const tmpPath = path.join(__dirname, `tmp_${uniqueId}_${filename}`);
     await page.pdf({
       path: tmpPath,
       format: "Letter",
@@ -205,7 +223,7 @@ app.post("/generate-contract", async (req, res) => {
       margin: { top: "0.5in", right: "0.5in", bottom: "0.5in", left: "0.5in" }
     });
 
-    await browser.close();
+    await page.close();
 
     // Send as download
     res.download(tmpPath, filename, (err) => {
