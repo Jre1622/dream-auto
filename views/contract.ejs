@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/output.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>Purchase Contract Generator</title>
+  </head>
+  <body class="bg-gray-50">
+    <%- include('partials/header') %>
+
+    <main class="flex-grow pt-20">
+      <div class="max-w-3xl mx-auto p-6 my-8">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+          <h1 class="text-2xl font-bold text-gray-900 mb-6 border-b pb-3">Purchase Contract Generator</h1>
+
+          <form id="contract-form">
+            <!-- Step 1: Vehicle Info -->
+            <div class="mb-8">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">Vehicle Information</h2>
+
+              <div class="mb-4">
+                <label for="vin" class="block text-sm font-medium text-gray-700 mb-1">VIN</label>
+                <div class="flex gap-2">
+                  <input
+                    type="text"
+                    id="vin"
+                    name="vin"
+                    maxlength="17"
+                    class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 uppercase font-mono"
+                    placeholder="Enter 17-digit VIN"
+                  />
+                  <button type="button" id="decode-vin-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap">
+                    Decode VIN
+                  </button>
+                </div>
+                <p id="vin-status" class="text-xs mt-1 text-gray-500"></p>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                  <label for="year" class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                  <input type="text" id="year" name="year" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+                <div>
+                  <label for="make" class="block text-sm font-medium text-gray-700 mb-1">Make</label>
+                  <input type="text" id="make" name="make" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+                <div>
+                  <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                  <input type="text" id="model" name="model" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label for="mileage" class="block text-sm font-medium text-gray-700 mb-1">Mileage</label>
+                  <input type="text" id="mileage" name="mileage" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 45,000" />
+                </div>
+                <div>
+                  <label for="color" class="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                  <input type="text" id="color" name="color" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: Customer Info -->
+            <div class="mb-8">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">Buyer Information</h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <input type="text" id="customerName" name="customerName" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+                <div>
+                  <label for="customerPhone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <input type="text" id="customerPhone" name="customerPhone" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="(555) 123-4567" />
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="customerAddress" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <input type="text" id="customerAddress" name="customerAddress" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="123 Main St, City, State ZIP" />
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label for="customerDL" class="block text-sm font-medium text-gray-700 mb-1">Driver's License / ID Number</label>
+                  <input type="text" id="customerDL" name="customerDL" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+                <div>
+                  <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input type="email" id="customerEmail" name="customerEmail" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                  <label for="customerInsurance" class="block text-sm font-medium text-gray-700 mb-1">Insurance Company</label>
+                  <input type="text" id="customerInsurance" name="customerInsurance" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. State Farm" />
+                </div>
+                <div>
+                  <label for="customerPolicyNumber" class="block text-sm font-medium text-gray-700 mb-1">Policy Number</label>
+                  <input type="text" id="customerPolicyNumber" name="customerPolicyNumber" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2b: Co-Buyer (optional toggle) -->
+            <div class="mb-8">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">Co-Buyer Information</h2>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="has-cobuyer" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              <div id="cobuyer-section" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label for="cobuyerName" class="block text-sm font-medium text-gray-700 mb-1">Co-Buyer Full Name</label>
+                    <input type="text" id="cobuyerName" name="cobuyerName" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                  </div>
+                  <div>
+                    <label for="cobuyerPhone" class="block text-sm font-medium text-gray-700 mb-1">Co-Buyer Phone</label>
+                    <input type="text" id="cobuyerPhone" name="cobuyerPhone" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="cobuyerAddress" class="block text-sm font-medium text-gray-700 mb-1">Co-Buyer Address</label>
+                  <input type="text" id="cobuyerAddress" name="cobuyerAddress" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="If different from buyer" />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label for="cobuyerDL" class="block text-sm font-medium text-gray-700 mb-1">Co-Buyer Driver's License / ID Number</label>
+                    <input type="text" id="cobuyerDL" name="cobuyerDL" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                  </div>
+                  <div>
+                    <label for="cobuyerEmail" class="block text-sm font-medium text-gray-700 mb-1">Co-Buyer Email</label>
+                    <input type="email" id="cobuyerEmail" name="cobuyerEmail" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Lien Holder (optional toggle) -->
+            <div class="mb-8">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">Lien Holder Information</h2>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="has-lienholder" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+
+              <div id="lienholder-section" class="hidden">
+                <div class="mb-4">
+                  <label for="lienholderName" class="block text-sm font-medium text-gray-700 mb-1">Lien Holder Name</label>
+                  <input type="text" id="lienholderName" name="lienholderName" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. Wells Fargo Auto Finance" />
+                </div>
+                <div class="mb-4">
+                  <label for="lienholderAddress" class="block text-sm font-medium text-gray-700 mb-1">Lien Holder Address</label>
+                  <input type="text" id="lienholderAddress" name="lienholderAddress" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. PO Box 1234, Des Moines, IA 50301" />
+                </div>
+                <div>
+                  <label for="lienholderAccount" class="block text-sm font-medium text-gray-700 mb-1">Lien Holder Account / Loan Number</label>
+                  <input type="text" id="lienholderAccount" name="lienholderAccount" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4: Pricing (pre-filled from calculator) -->
+            <div class="mb-8">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">Pricing Breakdown</h2>
+
+              <div class="bg-gray-50 rounded-lg p-4">
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Sale Price:</span>
+                    <span class="font-medium">$<span id="p-sale-price">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Sales Tax:</span>
+                    <span class="font-medium">$<span id="p-sales-tax">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Registration Fee:</span>
+                    <span class="font-medium">$<span id="p-reg-fee">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Doc Fee:</span>
+                    <span class="font-medium">$<span id="p-doc-fee">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Lien Fee:</span>
+                    <span class="font-medium">$<span id="p-lien-fee">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Title Fee:</span>
+                    <span class="font-medium">$<span id="p-title-fee">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Plate Fee:</span>
+                    <span class="font-medium">$<span id="p-plate-fee">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Wheelage Tax:</span>
+                    <span class="font-medium">$<span id="p-wheelage">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Transfer Tax:</span>
+                    <span class="font-medium">$<span id="p-transfer">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Tech Surcharge:</span>
+                    <span class="font-medium">$<span id="p-tech">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Safety Fee:</span>
+                    <span class="font-medium">$<span id="p-safety">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Filing Fee:</span>
+                    <span class="font-medium">$<span id="p-filing">0.00</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Excise Tax:</span>
+                    <span class="font-medium">$<span id="p-excise">0.00</span></span>
+                  </div>
+                </div>
+
+                <!-- Extra fee rows -->
+                <div class="border-t border-gray-200 mt-3 pt-3">
+                  <p class="text-xs text-gray-500 mb-2">Additional fees (optional):</p>
+                  <div class="flex gap-2 mb-2">
+                    <input type="text" id="extra-fee-1-label" class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Fee name (e.g. Gap Insurance)" />
+                    <input type="text" id="extra-fee-1-amount" class="w-24 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="$0.00" />
+                  </div>
+                  <div class="flex gap-2">
+                    <input type="text" id="extra-fee-2-label" class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Fee name (e.g. Paint Protection)" />
+                    <input type="text" id="extra-fee-2-amount" class="w-24 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="$0.00" />
+                  </div>
+                </div>
+
+                <div class="flex justify-between col-span-2 pt-2 border-t border-gray-200 mt-1">
+                    <span class="font-semibold text-gray-800">Total:</span>
+                    <span class="font-bold text-lg">$<span id="p-total">0.00</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 5: MN Legal Disclosures (collapsible) -->
+            <div class="mb-8">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">Minnesota Legal Disclosures</h2>
+                <button type="button" id="toggle-disclosures" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                  Show ▾
+                </button>
+              </div>
+
+              <div id="disclosures-content" class="hidden">
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 space-y-3">
+                  <p><strong>IMPORTANT:</strong> The information you see on the window form for this vehicle is part of this contract. Information on the window form overrides any contrary provisions in the contract of sale.</p>
+
+                  <p>Any motor vehicle sold to Purchaser by Dealer under this Order is sold <strong>WITHOUT WARRANTY, EXPRESS OR IMPLIED</strong>, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE as to its condition or the condition of any part thereof except as may be specifically provided in a separate writing furnished to Purchaser by Dealer. BUYER SHALL NOT BE ENTITLED TO RECOVER FROM THE SELLER ANY CONSEQUENTIAL DAMAGES, DAMAGES TO PROPERTY, DAMAGES FOR LOSS OF USE, LOSS OF TIME, LOSS OF PROFITS OR INCOME OR ANY OTHER INCIDENTAL DAMAGES. The Seller neither assumes nor authorizes any other person to assume for it any liability in connection with the sale of such vehicle. This disclaimer in no way affects the terms of any remaining manufacturer's warranty.</p>
+
+                  <p><strong>POLLUTION CONTROL SYSTEM DISCLOSURE</strong></p>
+                  <p>In order to comply with the Minnesota Statutes, Section 325E.0951, no person may transfer a motor vehicle without providing a written disclosure to the transferee (buyer) certifying the condition of the pollution control system. Transferor (seller) hereby certifies, to the best of his/her knowledge, that the pollution control system on this vehicle, including the restricted gasoline pipe, has not been removed, altered, or rendered inoperative.</p>
+                </div>
+              </div>
+
+              <!-- Additional Warranty Exception Notes -->
+              <div class="mt-4">
+                <label for="warranty-notes" class="block text-sm font-medium text-gray-700 mb-1">Warranty Exception Notes (if any)</label>
+                <textarea id="warranty-notes" name="warranty-notes" rows="3" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="e.g. Dealer provides 30-day powertrain warranty on engine and transmission only..."></textarea>
+                <p class="text-xs text-gray-500 mt-1">Leave blank if selling strictly as-is with no exceptions.</p>
+              </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button type="submit" id="generate-btn" class="w-full px-6 py-3 bg-green-600 text-white font-semibold text-lg rounded-lg hover:bg-green-700 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+              Generate & Download Contract PDF
+            </button>
+            <div id="status" class="mt-3 text-center text-sm hidden"></div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %>
+
+    <script>
+      // Toggle sections
+      document.getElementById('has-cobuyer').addEventListener('change', function() {
+        document.getElementById('cobuyer-section').classList.toggle('hidden', !this.checked);
+      });
+
+      document.getElementById('has-lienholder').addEventListener('change', function() {
+        document.getElementById('lienholder-section').classList.toggle('hidden', !this.checked);
+      });
+
+      // Toggle legal disclosures
+      document.getElementById('toggle-disclosures').addEventListener('click', function() {
+        const content = document.getElementById('disclosures-content');
+        const isHidden = content.classList.toggle('hidden');
+        this.textContent = isHidden ? 'Show ▾' : 'Hide ▴';
+      });
+
+      // Pre-fill pricing from URL params
+      const params = new URLSearchParams(window.location.search);
+      const pricingFields = {
+        salePrice: 'p-sale-price',
+        salesTax: 'p-sales-tax',
+        registrationFee: 'p-reg-fee',
+        docFee: 'p-doc-fee',
+        lienFee: 'p-lien-fee',
+        titleFee: 'p-title-fee',
+        plateFee: 'p-plate-fee',
+        wheelageTax: 'p-wheelage',
+        transferTax: 'p-transfer',
+        techSurcharge: 'p-tech',
+        safetyFee: 'p-safety',
+        filingFee: 'p-filing',
+        countyTax: 'p-excise',
+        totalPrice: 'p-total'
+      };
+
+      Object.entries(pricingFields).forEach(([param, elId]) => {
+        const val = params.get(param);
+        if (val) document.getElementById(elId).textContent = val;
+      });
+
+      // VIN Decoder using NHTSA API
+      document.getElementById('decode-vin-btn').addEventListener('click', async function() {
+        const vin = document.getElementById('vin').value.trim().toUpperCase();
+        const status = document.getElementById('vin-status');
+
+        if (vin.length !== 17) {
+          status.textContent = 'VIN must be 17 characters';
+          status.className = 'text-xs mt-1 text-red-500';
+          return;
+        }
+
+        status.textContent = 'Decoding VIN...';
+        status.className = 'text-xs mt-1 text-blue-500';
+        this.disabled = true;
+
+        try {
+          const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vin}?format=json`);
+          const data = await res.json();
+
+          if (data.Results && data.Results.length > 0) {
+            // Match by variable NAME instead of ID — much more reliable
+            const getByName = (name) => {
+              const item = data.Results.find(r => r.Variable === name && r.Value && r.Value !== 'null');
+              return item ? item.Value : '';
+            };
+
+            const fields = {
+              year: getByName('Model Year'),
+              make: getByName('Make'),
+              model: getByName('Series') || getByName('Model') || getByName('Vehicle Descriptor'),
+              trim: getByName('Trim') || '',
+              bodyClass: getByName('Body Class') || '',
+              engineCylinders: getByName('Engine Number of Cylinders') || '',
+              driveType: getByName('Drive Type') || '',
+              engineModel: getByName('Engine Model') || '',
+              fuelType: getByName('Fuel Type - Primary') || '',
+              transmission: getByName('Transmission Style') || '',
+              doors: getByName('Doors') || ''
+            };
+
+            if (fields.year) document.getElementById('year').value = fields.year;
+            if (fields.make) document.getElementById('make').value = fields.make;
+            if (fields.model) document.getElementById('model').value = fields.model;
+            // NHTSA API does NOT return paint color — leave it blank for manual entry
+
+            status.textContent = `Decoded: ${fields.year} ${fields.make} ${fields.model}`;
+            status.className = 'text-xs mt-1 text-green-600';
+          } else {
+            status.textContent = 'Could not decode VIN. Check the number and try again.';
+            status.className = 'text-xs mt-1 text-red-500';
+          }
+        } catch (err) {
+          status.textContent = 'Error decoding VIN. Check your internet connection.';
+          status.className = 'text-xs mt-1 text-red-500';
+        }
+
+        this.disabled = false;
+      });
+
+      // Form submission
+      document.getElementById('contract-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('generate-btn');
+        const status = document.getElementById('status');
+
+        btn.disabled = true;
+        btn.textContent = 'Generating...';
+        status.className = 'mt-3 text-center text-sm';
+
+        // Gather all form data
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        // Add pricing data
+        data.salePrice = document.getElementById('p-sale-price').textContent;
+        data.salesTax = document.getElementById('p-sales-tax').textContent;
+        data.totalPrice = document.getElementById('p-total').textContent;
+        data.docFee = document.getElementById('p-doc-fee').textContent;
+        data.lienFee = document.getElementById('p-lien-fee').textContent;
+        data.regFee = document.getElementById('p-reg-fee').textContent;
+        data.titleFee = document.getElementById('p-title-fee').textContent;
+        data.plateFee = document.getElementById('p-plate-fee').textContent;
+        data.wheelage = document.getElementById('p-wheelage').textContent;
+        data.transfer = document.getElementById('p-transfer').textContent;
+        data.tech = document.getElementById('p-tech').textContent;
+        data.safety = document.getElementById('p-safety').textContent;
+        data.filing = document.getElementById('p-filing').textContent;
+        data.excise = document.getElementById('p-excise').textContent;
+
+        // Add extra fee rows
+        data.extraFee1Label = document.getElementById('extra-fee-1-label').value || '';
+        data.extraFee1Amount = document.getElementById('extra-fee-1-amount').value || '';
+        data.extraFee2Label = document.getElementById('extra-fee-2-label').value || '';
+        data.extraFee2Amount = document.getElementById('extra-fee-2-amount').value || '';
+
+        // Add toggle states
+        data.hasCobuyer = document.getElementById('has-cobuyer').checked ? 'yes' : 'no';
+        data.hasLienholder = document.getElementById('has-lienholder').checked ? 'yes' : 'no';
+
+        try {
+          const res = await fetch('/generate-contract', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text);
+          }
+
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = '';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          status.textContent = 'PDF downloaded! Check your Downloads folder.';
+          status.className = 'mt-3 text-center text-sm text-green-600';
+        } catch (err) {
+          status.textContent = 'Error: ' + err.message;
+          status.className = 'mt-3 text-center text-sm text-red-600';
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Generate & Download Contract PDF';
+      });
+    </script>
+  </body>
+</html>

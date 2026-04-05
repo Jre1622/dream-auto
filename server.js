@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
+const puppeteer = require("puppeteer");
 require("dotenv").config();
 const db = require("./db/database");
 const adminRouter = require("./routes/admin");
@@ -68,6 +70,152 @@ app.get("/", async (req, res) => {
 
 app.get("/calculator", (req, res) => {
   res.render("calculator");
+});
+
+app.get("/contract", (req, res) => {
+  res.render("contract");
+});
+
+app.post("/generate-contract", async (req, res) => {
+  try {
+    const data = req.body;
+
+    // Build conditional sections
+    // Co-buyer section
+    if (data.hasCobuyer === "yes") {
+      data.cobuyerSection = `
+    <div class="section" style="margin-bottom: 6px;">
+      <div class="section-title" style="margin-bottom: 3px;">Co-Buyer Information</div>
+      <div class="field-row">
+        <div class="field">
+          <span class="field-label">Full Name:</span><br>
+          <span class="field-value" style="min-width: 95%; min-height: 18px;">${data.cobuyerName || ""}</span>
+        </div>
+      </div>
+      <div class="field-row" style="margin-top: 2px;">
+        <div class="field">
+          <span class="field-label">Address:</span><br>
+          <span class="field-value" style="min-width: 95%; min-height: 18px;">${data.cobuyerAddress || data.customerAddress || ""}</span>
+        </div>
+      </div>
+      <div class="field-row" style="margin-top: 2px;">
+        <div class="field">
+          <span class="field-label">Phone:</span><br>
+          <span class="field-value" style="min-height: 18px;">${data.cobuyerPhone || ""}</span>
+        </div>
+        <div class="field">
+          <span class="field-label">DL/ID Number:</span><br>
+          <span class="field-value" style="min-height: 18px;">${data.cobuyerDL || ""}</span>
+        </div>
+        <div class="field">
+          <span class="field-label">Email:</span><br>
+          <span class="field-value" style="min-height: 18px;">${data.cobuyerEmail || ""}</span>
+        </div>
+      </div>
+    </div>`;
+      data.cobuyerSignature = `
+    <div class="cobuyer-sig">
+      <p><strong>Co-Buyer Signature:</strong></p>
+      <div class="signature-line">Co-Buyer Signature</div>
+    </div>`;
+    } else {
+      data.cobuyerSection = "";
+      data.cobuyerSignature = "";
+    }
+
+    // Lien holder section
+    if (data.hasLienholder === "yes") {
+      data.lienholderSection = `
+  <div class="section" style="margin-bottom: 6px;">
+    <div class="section-title" style="margin-bottom: 3px;">Lien Holder Information</div>
+    <div class="lienholder-box" style="padding: 4px 6px;">
+      <div class="field-row">
+        <div class="field">
+          <span class="field-label">Lien Holder:</span><br>
+          <span class="field-value" style="min-height: 18px;">${data.lienholderName || ""}</span>
+        </div>
+        <div class="field">
+          <span class="field-label">Account/Loan #:</span><br>
+          <span class="field-value" style="min-height: 18px;">${data.lienholderAccount || ""}</span>
+        </div>
+      </div>
+      <div class="field-row" style="margin-top: 2px;">
+        <div class="field">
+          <span class="field-label">Address:</span><br>
+          <span class="field-value" style="min-width: 95%; min-height: 18px;">${data.lienholderAddress || ""}</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+    } else {
+      data.lienholderSection = "";
+    }
+
+    // Warranty exception notes
+    if (data["warranty-notes"] && data["warranty-notes"].trim()) {
+      data.warrantyNotes = `
+    <div style="font-size: 9pt; margin-top: 6px; padding: 6px 8px; border: 1px solid #000;">
+      <div style="font-weight: bold; margin-bottom: 3px;">Additional Terms / Warranty Exceptions:</div>
+      <p>${data["warranty-notes"]}</p>
+    </div>`;
+    } else {
+      data.warrantyNotes = "";
+    }
+
+    // Extra fee rows — only render if filled in
+    data.extraFee1Row = "";
+    data.extraFee2Row = "";
+    if (data.extraFee1Label && data.extraFee1Label.trim()) {
+      data.extraFee1Row = `<tr><td>${data.extraFee1Label}</td><td style="text-align: right;">$${data.extraFee1Amount || ""}</td></tr>`;
+    }
+    if (data.extraFee2Label && data.extraFee2Label.trim()) {
+      data.extraFee2Row = `<tr><td>${data.extraFee2Label}</td><td style="text-align: right;">$${data.extraFee2Amount || ""}</td></tr>`;
+    }
+
+    // Read template
+    let template = fs.readFileSync(path.join(__dirname, "views", "contract-template.html"), "utf8");
+
+    // Inject dealership info (hardcoded for now)
+    data.dealerName = "Dream Auto LLC";
+    data.dealerAddress = "580 Dodge Ave NW Ste 4, Elk River, MN 55330";
+    data.dealerPhone = process.env.DEALERSHIP_PHONE || "";
+
+    // Replace all placeholders
+    Object.keys(data).forEach(key => {
+      const placeholder = `{{${key}}}`;
+      template = template.split(placeholder).join(data[key] || "");
+    });
+
+    // Generate filename
+    const date = new Date().toISOString().split("T")[0];
+    const name = (data.customerName || "Unknown").replace(/[^a-zA-Z0-9]/g, "_");
+    const vehicle = (data.year || "") + "_" + (data.make || "") + "_" + (data.model || "");
+    const filename = `${date}_${name}_${vehicle}.pdf`.replace(/_+/g, "_");
+
+    // Generate PDF
+    const browser = await puppeteer.launch({ headless: "new" });
+    const page = await browser.newPage();
+    await page.setContent(template, { waitUntil: "networkidle0" });
+
+    const tmpPath = path.join(__dirname, "tmp_" + filename);
+    await page.pdf({
+      path: tmpPath,
+      format: "Letter",
+      printBackground: true,
+      margin: { top: "0.5in", right: "0.5in", bottom: "0.5in", left: "0.5in" }
+    });
+
+    await browser.close();
+
+    // Send as download
+    res.download(tmpPath, filename, (err) => {
+      fs.unlink(tmpPath, () => {});
+      if (err) console.error("Download error:", err);
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error generating PDF: " + err.message);
+  }
 });
 
 app.listen(PORT, () => {

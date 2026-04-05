@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Times New Roman', Times, serif; padding: 0.5in; font-size: 10.5pt; line-height: 1.35; color: #000; }
+    .header { text-align: center; margin-bottom: 10px; padding-bottom: 4px; }
+    .header h1 { font-size: 16pt; margin-bottom: 2px; }
+    .header h2 { font-size: 11pt; font-weight: normal; }
+    .section { margin-bottom: 10px; }
+    .section-title { font-weight: bold; font-size: 11pt; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 5px; }
+    .field { margin-bottom: 3px; }
+    .field-label { font-weight: bold; display: inline; }
+    .field-value { border-bottom: 1px solid #333; display: inline-block; min-width: 180px; padding: 0 4px; }
+    .field-row { display: flex; gap: 12px; margin-bottom: 3px; }
+    .field-row .field { flex: 1; }
+    table { width: 100%; border-collapse: collapse; margin: 4px 0; font-size: 9.5pt; }
+    table th, table td { border: 1px solid #000; padding: 2px 5px; text-align: left; line-height: 1.3; }
+    table th { background: #eee; }
+    .disclosure { font-size: 9pt; margin-bottom: 6px; padding: 3px 0; }
+    .disclosure-title { font-weight: bold; font-size: 10pt; }
+    .signature-block { margin-top: 20px; page-break-inside: avoid; }
+    .signature-line { margin-top: 30px; border-top: 1px solid #000; width: 260px; padding-top: 3px; font-size: 9pt; }
+    .date-line { margin-top: 12px; }
+    .cobuyer-sig { margin-top: 16px; }
+    .lienholder-box { border: 1px solid #000; padding: 5px 7px; margin-top: 3px; }
+  </style>
+</head>
+<body>
+
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+    <!-- DEALERSHIP INFO (top left) -->
+    <div style="font-size: 9.5pt; text-align: left;">
+      <div style="font-weight: bold; font-size: 12pt;">{{dealerName}}</div>
+      <div>{{dealerAddress}}</div>
+      <div>{{dealerPhone}}</div>
+    </div>
+
+    <!-- CONTRACT TITLE (top right) -->
+    <div style="text-align: right;">
+      <div style="font-size: 16pt; font-weight: bold;">VEHICLE PURCHASE CONTRACT</div>
+      <div style="font-size: 11pt;">Bill of Sale & Purchase Agreement</div>
+    </div>
+  </div>
+
+  <!-- VEHICLE INFORMATION (first) -->
+  <div class="section" style="margin-bottom: 6px;">
+    <table>
+      <tr><th>Year</th><th>Make</th><th>Model</th><th>Mileage</th><th>Color</th></tr>
+      <tr><td>{{year}}</td><td>{{make}}</td><td>{{model}}</td><td>{{mileage}}</td><td>{{color}}</td></tr>
+    </table>
+    <div class="field" style="margin-top: 5px; text-align: center;">
+      <span class="field-label">VIN: </span><span style="font-family: monospace; letter-spacing: 1px;">{{vin}}</span>
+    </div>
+  </div>
+
+  <!-- BUYER INFORMATION -->
+  <div class="section" style="margin-bottom: 6px;">
+    <div class="section-title" style="margin-bottom: 3px;">Buyer Information</div>
+    <div class="field-row">
+      <div class="field">
+        <span class="field-label">Full Name:</span><br>
+        <span class="field-value" style="min-width: 95%; min-height: 18px;">{{customerName}}</span>
+      </div>
+    </div>
+    <div class="field-row" style="margin-top: 2px;">
+      <div class="field">
+        <span class="field-label">Address:</span><br>
+        <span class="field-value" style="min-width: 95%; min-height: 18px;">{{customerAddress}}</span>
+      </div>
+    </div>
+    <div class="field-row" style="margin-top: 2px;">
+      <div class="field">
+        <span class="field-label">Phone:</span><br>
+        <span class="field-value" style="min-height: 18px;">{{customerPhone}}</span>
+      </div>
+      <div class="field">
+        <span class="field-label">DL/ID Number:</span><br>
+        <span class="field-value" style="min-height: 18px;">{{customerDL}}</span>
+      </div>
+      <div class="field">
+        <span class="field-label">Email:</span><br>
+        <span class="field-value" style="min-height: 18px;">{{customerEmail}}</span>
+      </div>
+    </div>
+    <div class="field-row" style="margin-top: 2px;">
+      <div class="field" style="flex: 1;">
+        <span class="field-label">Insurance Company:</span><br>
+        <span class="field-value" style="width: 100%; min-height: 18px;">{{customerInsurance}}</span>
+      </div>
+      <div class="field" style="flex: 1;">
+        <span class="field-label">Policy Number:</span><br>
+        <span class="field-value" style="width: 100%; min-height: 18px;">{{customerPolicyNumber}}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CO-BUYER INFORMATION (conditional) -->
+  {{cobuyerSection}}
+
+  <!-- LIEN HOLDER INFORMATION (conditional) -->
+  {{lienholderSection}}
+
+  <!-- PRICING BREAKDOWN -->
+  <div class="section">
+    <div class="section-title" style="border-bottom: none; text-align: center; margin-bottom: 3px;">Pricing Breakdown</div>
+    <table style="width: 70%; margin-left: auto; margin-right: auto;">
+      <tr><th>Description</th><th style="width: 100px; text-align: right;">Amount</th></tr>
+      <tr><td>Sale Price</td><td style="text-align: right;">${{salePrice}}</td></tr>
+      <tr><td>Sales Tax</td><td style="text-align: right;">${{salesTax}}</td></tr>
+      <tr><td>Registration Fee</td><td style="text-align: right;">${{regFee}}</td></tr>
+      <tr><td>Documentation Fee</td><td style="text-align: right;">${{docFee}}</td></tr>
+      <tr><td>Lien Fee</td><td style="text-align: right;">${{lienFee}}</td></tr>
+      <tr><td>Title Fee</td><td style="text-align: right;">${{titleFee}}</td></tr>
+      <tr><td>License Plate Fee</td><td style="text-align: right;">${{plateFee}}</td></tr>
+      <tr><td>Wheelage Tax</td><td style="text-align: right;">${{wheelage}}</td></tr>
+      <tr><td>Transfer Tax</td><td style="text-align: right;">${{transfer}}</td></tr>
+      <tr><td>Technology Surcharge</td><td style="text-align: right;">${{tech}}</td></tr>
+      <tr><td>Public Safety Fee</td><td style="text-align: right;">${{safety}}</td></tr>
+      <tr><td>State Filing Fee</td><td style="text-align: right;">${{filing}}</td></tr>
+      <tr><td>Dealer Excise Tax</td><td style="text-align: right;">${{excise}}</td></tr>
+      {{extraFee1Row}}
+      {{extraFee2Row}}
+      <tr style="font-weight: bold; background: #f0f0f0;"><td>Total Out-the-Door Price</td><td style="text-align: right;">${{totalPrice}}</td></tr>
+    </table>
+  </div>
+
+  <!-- MINNESOTA LEGAL DISCLOSURES -->
+  <div class="section">
+    <div class="section-title" style="border-bottom: none; text-align: center; margin-bottom: 3px;">Minnesota Legal Disclosures</div>
+
+    <div style="font-size: 9pt; margin-bottom: 8px; line-height: 1.35;">
+      <p style="margin-bottom: 6px;"><strong>IMPORTANT:</strong> The information you see on the window form for this vehicle is part of this contract. Information on the window form overrides any contrary provisions in the contract of sale.</p>
+
+      <p style="margin-bottom: 6px;">Any motor vehicle sold to Purchaser by Dealer under this Order is sold <strong>WITHOUT WARRANTY, EXPRESS OR IMPLIED</strong>, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE as to its condition or the condition of any part thereof except as may be specifically provided in a separate writing furnished to Purchaser by Dealer. BUYER SHALL NOT BE ENTITLED TO RECOVER FROM THE SELLER ANY CONSEQUENTIAL DAMAGES, DAMAGES TO PROPERTY, DAMAGES FOR LOSS OF USE, LOSS OF TIME, LOSS OF PROFITS OR INCOME OR ANY OTHER INCIDENTAL DAMAGES. The Seller neither assumes nor authorizes any other person to assume for it any liability in connection with the sale of such vehicle. This disclaimer in no way affects the terms of any remaining manufacturer's warranty.</p>
+
+      <p style="margin-bottom: 4px;"><strong>POLLUTION CONTROL SYSTEM DISCLOSURE</strong></p>
+      <p style="margin-bottom: 6px;">In order to comply with the Minnesota Statutes, Section 325E.0951, no person may transfer a motor vehicle without providing a written disclosure to the transferee (buyer) certifying the condition of the pollution control system. Transferor (seller) hereby certifies, to the best of his/her knowledge, that the pollution control system on this vehicle, including the restricted gasoline pipe, has not been removed, altered, or rendered inoperative.</p>
+    </div>
+
+    {{warrantyNotes}}
+  </div>
+
+  <!-- SIGNATURES -->
+  <div class="section">
+    <p style="font-size: 9pt; margin-bottom: 8px;">By signing below, the buyer(s) acknowledge that they have read, understood, and agree to all terms, conditions, and disclosures contained in this contract. The buyer(s) confirm that the vehicle information listed above is accurate and that they are purchasing the vehicle in its current condition.</p>
+  </div>
+
+  <div class="signature-block">
+    <div class="field-row" style="gap: 40px;">
+      <div style="flex: 1;">
+        <p><strong>Buyer Signature:</strong></p>
+        <div class="signature-line" style="width: 100%;">Signature</div>
+      </div>
+      <div style="flex: 1;">
+        <p><strong>Dealer Signature:</strong></p>
+        <div class="signature-line" style="width: 100%;">Signature</div>
+      </div>
+    </div>
+
+    {{cobuyerSignature}}
+
+    <div class="date-line">
+      <strong>Date:</strong> ________________________
+    </div>
+  </div>
+
+</body>
+</html>

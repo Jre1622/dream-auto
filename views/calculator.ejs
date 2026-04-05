@@ -218,6 +218,16 @@
             </div>
           </div>
         </div>
+
+        <!-- Generate Contract Button (below total) -->
+        <div class="mt-6 text-center">
+          <button id="generate-contract-btn" class="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold text-lg rounded-lg hover:bg-green-700 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Generate Purchase Contract
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -528,7 +538,40 @@
       document.getElementById("safety-fee").textContent = FEES.PUBLIC_SAFETY_FEE.toFixed(2);
       document.getElementById("filing-fee").textContent = FEES.STATE_FILING_FEE.toFixed(2);
       document.getElementById("wheelage-tax").textContent = FEES.WHEELAGE_TAX.toFixed(2);
+
+      // Enable contract button when we have a valid total
+      const contractBtn = document.getElementById("generate-contract-btn");
+      if (results.totalPrice > 0 && results.salePrice > 0) {
+        contractBtn.disabled = false;
+      } else {
+        contractBtn.disabled = true;
+      }
     }
+
+    // Generate Contract button handler
+    document.getElementById("generate-contract-btn").addEventListener("click", function() {
+      const params = new URLSearchParams({
+        salePrice: document.getElementById("sale-price-result").textContent,
+        salesTax: document.getElementById("sales-tax").textContent,
+        totalPrice: document.getElementById("final-total-price").textContent,
+        docFee: document.getElementById("doc-fee-result").textContent,
+        lienFee: document.getElementById("lien-fee-result").textContent,
+        registrationFee: document.getElementById("registration-fee").textContent,
+        countyTax: document.getElementById("county-tax").textContent,
+        plateFee: document.getElementById("plate-fee").textContent,
+        techSurcharge: document.getElementById("tech-surcharge").textContent,
+        titleFee: document.getElementById("title-fee").textContent,
+        transferTax: document.getElementById("transfer-tax").textContent,
+        safetyFee: document.getElementById("safety-fee").textContent,
+        filingFee: document.getElementById("filing-fee").textContent,
+        wheelageTax: document.getElementById("wheelage-tax").textContent,
+        county: countySelect.value || "",
+        vehicleAge: document.getElementById("vehicle-age").value,
+        hasLien: document.getElementById("lien-fee").checked ? "1" : "0",
+        hasExcise: document.getElementById("anoka-transfer").checked ? "1" : "0"
+      });
+      window.open("/contract?" + params.toString(), "_blank");
+    });
   </script>
     </main>
 
