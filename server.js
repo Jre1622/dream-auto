@@ -127,12 +127,35 @@ function buildContractPdf(doc, data) {
   doc.info.Author = data.dealerName;
   doc.font("Times-Roman").fontSize(10.5);
 
-  doc.font("Times-Bold").fontSize(14).text(data.dealerName);
-  doc.font("Times-Roman").fontSize(10.5).text(data.dealerAddress);
-  doc.text(data.dealerPhone);
-  doc.moveDown(0.3);
-  doc.font("Times-Bold").fontSize(16).text("VEHICLE PURCHASE CONTRACT", { align: "right" });
-  doc.font("Times-Roman").fontSize(11).text("Bill of Sale & Purchase Agreement", { align: "right" });
+  const headerTop = doc.y;
+  const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+  const leftColumnWidth = 250;
+  const rightColumnX = doc.page.margins.left + leftColumnWidth + 20;
+  const rightColumnWidth = pageWidth - leftColumnWidth - 20;
+
+  doc.font("Times-Bold").fontSize(14).text(data.dealerName, doc.page.margins.left, headerTop, {
+    width: leftColumnWidth,
+    align: "left",
+  });
+  doc.font("Times-Roman").fontSize(10.5).text(data.dealerAddress, doc.page.margins.left, doc.y, {
+    width: leftColumnWidth,
+    align: "left",
+  });
+  doc.text(data.dealerPhone, doc.page.margins.left, doc.y, {
+    width: leftColumnWidth,
+    align: "left",
+  });
+
+  doc.font("Times-Bold").fontSize(16).text("VEHICLE PURCHASE CONTRACT", rightColumnX, headerTop, {
+    width: rightColumnWidth,
+    align: "right",
+  });
+  doc.font("Times-Roman").fontSize(11).text("Bill of Sale & Purchase Agreement", rightColumnX, doc.y, {
+    width: rightColumnWidth,
+    align: "right",
+  });
+
+  doc.y = Math.max(doc.y, headerTop + 54);
   horizontalRule(doc);
 
   sectionTitle(doc, "Vehicle Information");
