@@ -66,6 +66,139 @@ function horizontalRule(doc) {
   doc.moveDown(0.5);
 }
 
+function vehicleInfoBox(doc, data) {
+  const boxX = doc.page.margins.left;
+  const boxWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+  const numCols = 5; // Year, Make, Model, Mileage, Color
+  const colGap = 1; // thin separator lines
+  const colWidth = (boxWidth - colGap * (numCols - 1)) / numCols;
+  const headerH = 20;
+  const valueH = 20;
+  const boxHeight = headerH + valueH;
+  const padX = 6;
+  const vinLineH = 18;
+  const totalHeight = vinLineH + boxHeight;
+  const boxY = doc.y;
+
+  ensureSpace(doc, totalHeight + 12);
+
+  const fields = [
+    { label: "Year", value: data.year },
+    { label: "Make", value: data.make },
+    { label: "Model", value: data.model },
+    { label: "Mileage", value: data.mileage },
+    { label: "Color", value: data.color },
+  ];
+
+  // VIN line above the table, centered
+  doc.font("Times-Bold").fontSize(10).text(`VIN: ${safeText(data.vin)}`, boxX, boxY + 2, {
+    width: boxWidth,
+    align: "center",
+  });
+
+  // Table box starts below VIN
+  const tableY = boxY + vinLineH;
+
+  // Draw the box
+  doc.rect(boxX, tableY, boxWidth, boxHeight).stroke();
+
+  // Horizontal divider between header row and value row
+  doc.moveTo(boxX, tableY + headerH).lineTo(boxX + boxWidth, tableY + headerH).stroke();
+
+  fields.forEach((field, i) => {
+    const x = boxX + i * (colWidth + colGap);
+
+    // Vertical separators between columns
+    if (i > 0) {
+      doc.moveTo(x, tableY).lineTo(x, tableY + boxHeight).stroke();
+    }
+
+    // Header label — vertically centered in header row
+    doc.font("Times-Bold").fontSize(10).text(field.label, x + padX, tableY + headerH / 2 - 4, {
+      width: colWidth - padX * 2,
+      align: "center",
+    });
+
+    // Value — vertically centered in value row
+    doc.font("Times-Roman").fontSize(10).text(safeText(field.value) || " ", x + padX, tableY + headerH + valueH / 2 - 4, {
+      width: colWidth - padX * 2,
+      align: "center",
+    });
+  });
+
+  doc.x = doc.page.margins.left;
+  doc.y = tableY + boxHeight + 6;
+}
+
+// Draws a bordered info box with a bold header and rows of label-value pairs.
+function infoBox(doc, title, rows) {
+  const boxX = doc.page.margins.left;
+  const boxWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+  const rowH = 16;
+  const headerH = 18;
+  const padX = 8;
+  const halfWidth = (boxWidth - 1) / 2;
+  const boxHeight = headerH + rows.length * rowH;
+  const startY = doc.y;
+
+  ensureSpace(doc, boxHeight + 12);
+
+  // Draw box border and header divider
+  doc.rect(boxX, startY, boxWidth, boxHeight).stroke();
+
+  // Header
+  doc.font("Times-Bold").fontSize(11).text(title, boxX + padX, startY + 2, {
+    width: boxWidth - padX * 2,
+    align: "left",
+  });
+
+  // Rows
+  rows.forEach((row, i) => {
+    const y = startY + headerH + i * rowH + 2;
+    if (row.width === "full") {
+      doc.font("Times-Bold").fontSize(9.5).text(`${row.label}: `, boxX + padX, y, {
+        continued: true,
+        width: boxWidth - padX * 2,
+      });
+      doc.font("Times-Roman").fontSize(9.5).text(safeText(row.value) || " ", {
+        width: boxWidth - padX * 2,
+      });
+      doc.y = y + rowH; // reset Y to keep rows tight
+    } else {
+      const leftX = boxX + padX;
+      const rightX = boxX + halfWidth + 1 + padX;
+      const colW = halfWidth - padX * 2;
+
+      // Vertical divider between half-width columns
+      doc.moveTo(boxX + halfWidth, startY + headerH + i * rowH)
+        .lineTo(boxX + halfWidth, startY + headerH + (i + 1) * rowH)
+        .stroke();
+
+      doc.font("Times-Bold").fontSize(9.5).text(`${row.label}: `, leftX, y, {
+        continued: true,
+        width: colW,
+      });
+      doc.font("Times-Roman").fontSize(9.5).text(safeText(row.value) || " ", {
+        width: colW,
+      });
+
+      if (row.label2) {
+        doc.font("Times-Bold").fontSize(9.5).text(`${row.label2}: `, rightX, y, {
+          continued: true,
+          width: colW,
+        });
+        doc.font("Times-Roman").fontSize(9.5).text(safeText(row.value2) || " ", {
+          width: colW,
+        });
+      }
+      doc.y = y + rowH; // reset Y to keep rows tight
+    }
+  });
+
+  doc.x = doc.page.margins.left;
+  doc.y = startY + boxHeight + 6;
+}
+
 function pricingTable(doc, rows) {
   const left = doc.page.margins.left;
   const amountX = doc.page.width - doc.page.margins.right - 110;
@@ -132,63 +265,59 @@ function buildContractPdf(doc, data) {
   const leftColumnWidth = 250;
   const rightColumnX = doc.page.margins.left + leftColumnWidth + 20;
   const rightColumnWidth = pageWidth - leftColumnWidth - 20;
+  const lineH = 18;
 
+  // Left column — dealer info
   doc.font("Times-Bold").fontSize(14).text(data.dealerName, doc.page.margins.left, headerTop, {
     width: leftColumnWidth,
     align: "left",
   });
-  doc.font("Times-Roman").fontSize(10.5).text(data.dealerAddress, doc.page.margins.left, doc.y, {
+  doc.font("Times-Roman").fontSize(10.5).text(data.dealerAddress, doc.page.margins.left, headerTop + lineH, {
     width: leftColumnWidth,
     align: "left",
   });
-  doc.text(data.dealerPhone, doc.page.margins.left, doc.y, {
+  doc.text(data.dealerPhone, doc.page.margins.left, headerTop + lineH * 2, {
     width: leftColumnWidth,
     align: "left",
   });
 
+  // Right column — contract title
   doc.font("Times-Bold").fontSize(16).text("VEHICLE PURCHASE CONTRACT", rightColumnX, headerTop, {
     width: rightColumnWidth,
     align: "right",
   });
-  doc.font("Times-Roman").fontSize(11).text("Bill of Sale & Purchase Agreement", rightColumnX, doc.y, {
+  doc.font("Times-Roman").fontSize(11).text("Bill of Sale & Purchase Agreement", rightColumnX, headerTop + lineH, {
     width: rightColumnWidth,
     align: "right",
   });
 
-  doc.y = Math.max(doc.y, headerTop + 54);
-  horizontalRule(doc);
+  // VIN line directly below header, then vehicle info box
+  doc.x = doc.page.margins.left;
+  doc.y = headerTop + lineH * 3;
 
-  sectionTitle(doc, "Vehicle Information");
-  labelValue(doc, "Year", data.year);
-  labelValue(doc, "Make", data.make);
-  labelValue(doc, "Model", data.model);
-  labelValue(doc, "Mileage", data.mileage);
-  labelValue(doc, "Color", data.color);
-  labelValue(doc, "VIN", data.vin);
+  vehicleInfoBox(doc, data);
 
-  sectionTitle(doc, "Buyer Information");
-  labelValue(doc, "Full Name", data.customerName);
-  labelValue(doc, "Address", data.customerAddress);
-  labelValue(doc, "Phone", data.customerPhone);
-  labelValue(doc, "DL/ID Number", data.customerDL);
-  labelValue(doc, "Email", data.customerEmail);
-  labelValue(doc, "Insurance Company", data.customerInsurance);
-  labelValue(doc, "Policy Number", data.customerPolicyNumber);
+  infoBox(doc, "Buyer Information", [
+    { label: "Full Name", value: data.customerName, label2: "Phone", value2: data.customerPhone },
+    { label: "Address", value: data.customerAddress, width: "full" },
+    { label: "DL/ID Number", value: data.customerDL, label2: "Email", value2: data.customerEmail },
+    { label: "Insurance Company", value: data.customerInsurance, label2: "Policy Number", value2: data.customerPolicyNumber },
+  ]);
 
   if (data.hasCobuyer === "yes") {
-    sectionTitle(doc, "Co-Buyer Information");
-    labelValue(doc, "Full Name", data.cobuyerName);
-    labelValue(doc, "Address", data.cobuyerAddress || data.customerAddress);
-    labelValue(doc, "Phone", data.cobuyerPhone);
-    labelValue(doc, "DL/ID Number", data.cobuyerDL);
-    labelValue(doc, "Email", data.cobuyerEmail);
+    infoBox(doc, "Co-Buyer Information", [
+      { label: "Full Name", value: data.cobuyerName, label2: "Phone", value2: data.cobuyerPhone },
+      { label: "Address", value: data.cobuyerAddress || data.customerAddress, width: "full" },
+      { label: "DL/ID Number", value: data.cobuyerDL, label2: "Email", value2: data.cobuyerEmail },
+    ]);
   }
 
   if (data.hasLienholder === "yes") {
-    sectionTitle(doc, "Lien Holder Information");
-    labelValue(doc, "Lien Holder", data.lienholderName);
-    labelValue(doc, "Address", data.lienholderAddress);
-    labelValue(doc, "Account / Loan Number", data.lienholderAccount);
+    infoBox(doc, "Lien Holder Information", [
+      { label: "Lien Holder", value: data.lienholderName, width: "full" },
+      { label: "Address", value: data.lienholderAddress, width: "full" },
+      { label: "Account / Loan Number", value: data.lienholderAccount, width: "full" },
+    ]);
   }
 
   sectionTitle(doc, "Pricing Breakdown");
@@ -288,7 +417,8 @@ app.get("/contract", (req, res) => {
 
 app.post("/generate-contract", async (req, res) => {
   try {
-    const data = req.body;
+    // Handle both JSON (fetch API) and form-encoded (form submission) data
+    const data = req.body || {};
     data.dealerName = "Dream Auto LLC";
     data.dealerAddress = "580 Dodge Ave NW Ste 4, Elk River, MN 55330";
     data.dealerPhone = process.env.DEALERSHIP_PHONE || "";
