@@ -69,8 +69,8 @@ function horizontalRule(doc) {
 function vehicleInfoBox(doc, data) {
   const boxX = doc.page.margins.left;
   const boxWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
-  const numCols = 5; // Year, Make, Model, Mileage, Color
-  const colGap = 1; // thin separator lines
+  const numCols = 5;
+  const colGap = 1;
   const colWidth = (boxWidth - colGap * (numCols - 1)) / numCols;
   const headerH = 20;
   const valueH = 20;
@@ -90,36 +90,27 @@ function vehicleInfoBox(doc, data) {
     { label: "Color", value: data.color },
   ];
 
-  // VIN line above the table, centered
   doc.font("Times-Bold").fontSize(10).text(`VIN: ${safeText(data.vin)}`, boxX, boxY + 2, {
     width: boxWidth,
     align: "center",
   });
 
-  // Table box starts below VIN
   const tableY = boxY + vinLineH;
-
-  // Draw the box
   doc.rect(boxX, tableY, boxWidth, boxHeight).stroke();
-
-  // Horizontal divider between header row and value row
   doc.moveTo(boxX, tableY + headerH).lineTo(boxX + boxWidth, tableY + headerH).stroke();
 
   fields.forEach((field, i) => {
     const x = boxX + i * (colWidth + colGap);
 
-    // Vertical separators between columns
     if (i > 0) {
       doc.moveTo(x, tableY).lineTo(x, tableY + boxHeight).stroke();
     }
 
-    // Header label — vertically centered in header row
     doc.font("Times-Bold").fontSize(10).text(field.label, x + padX, tableY + headerH / 2 - 4, {
       width: colWidth - padX * 2,
       align: "center",
     });
 
-    // Value — vertically centered in value row
     doc.font("Times-Roman").fontSize(10).text(safeText(field.value) || " ", x + padX, tableY + headerH + valueH / 2 - 4, {
       width: colWidth - padX * 2,
       align: "center",
@@ -130,7 +121,6 @@ function vehicleInfoBox(doc, data) {
   doc.y = tableY + boxHeight + 6;
 }
 
-// Draws a bordered info box with a bold header and rows of label-value pairs.
 function infoBox(doc, title, rows) {
   const boxX = doc.page.margins.left;
   const boxWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
@@ -143,16 +133,13 @@ function infoBox(doc, title, rows) {
 
   ensureSpace(doc, boxHeight + 12);
 
-  // Draw box border and header divider
   doc.rect(boxX, startY, boxWidth, boxHeight).stroke();
 
-  // Header
   doc.font("Times-Bold").fontSize(11).text(title, boxX + padX, startY + 2, {
     width: boxWidth - padX * 2,
     align: "left",
   });
 
-  // Rows
   rows.forEach((row, i) => {
     const y = startY + headerH + i * rowH + 2;
     if (row.width === "full") {
@@ -163,13 +150,12 @@ function infoBox(doc, title, rows) {
       doc.font("Times-Roman").fontSize(9.5).text(safeText(row.value) || " ", {
         width: boxWidth - padX * 2,
       });
-      doc.y = y + rowH; // reset Y to keep rows tight
+      doc.y = y + rowH;
     } else {
       const leftX = boxX + padX;
       const rightX = boxX + halfWidth + 1 + padX;
       const colW = halfWidth - padX * 2;
 
-      // Vertical divider between half-width columns
       doc.moveTo(boxX + halfWidth, startY + headerH + i * rowH)
         .lineTo(boxX + halfWidth, startY + headerH + (i + 1) * rowH)
         .stroke();
@@ -191,7 +177,7 @@ function infoBox(doc, title, rows) {
           width: colW,
         });
       }
-      doc.y = y + rowH; // reset Y to keep rows tight
+      doc.y = y + rowH;
     }
   });
 
@@ -201,34 +187,87 @@ function infoBox(doc, title, rows) {
 
 function pricingTable(doc, rows) {
   const left = doc.page.margins.left;
-  const amountX = doc.page.width - doc.page.margins.right - 110;
-
-  ensureSpace(doc, rows.length * 18 + 28);
-  doc.font("Times-Bold").text("Description", left, doc.y, { width: amountX - left - 10 });
-  doc.text("Amount", amountX, doc.y, { width: 110, align: "right" });
-  horizontalRule(doc);
-
-  rows.forEach((row) => {
-    ensureSpace(doc, 18);
-    doc.font(row.bold ? "Times-Bold" : "Times-Roman").text(row.label, left, doc.y, {
-      width: amountX - left - 10,
+  const right = doc.page.width - doc.page.margins.right;
+  const tableWidth = right - left;
+  const amountWidth = 80;
+  const descWidth = tableWidth - amountWidth - 20;
+  const rowHeight = 11;
+  const startY = doc.y;
+  
+  const totalHeight = (rows.length + 1) * rowHeight;
+  ensureSpace(doc, totalHeight + 16);
+  
+  doc.font("Times-Bold").fontSize(10);
+  doc.text("Description", left, startY, { width: descWidth });
+  doc.text("Amount", left + descWidth + 10, startY, { width: amountWidth, align: "right" });
+  
+  const headerY = startY + rowHeight - 2;
+  doc.moveTo(left, headerY).lineTo(right, headerY).stroke();
+  
+  let currentY = headerY + 3;
+  
+  rows.forEach((row, index) => {
+    const isLastRow = index === rows.length - 1;
+    const isTotalRow = isLastRow && row.bold;
+    
+    if (row.bold) {
+      doc.font("Times-Bold");
+    } else {
+      doc.font("Times-Roman");
+    }
+    
+    if (isTotalRow) {
+      doc.moveTo(left, currentY - 2).lineTo(right, currentY - 2).stroke();
+    }
+    
+    doc.text(row.label, left + 2, currentY, { width: descWidth - 4, lineGap: 0 });
+    doc.text(moneyText(row.amount), left + descWidth + 10, currentY, { 
+      width: amountWidth, 
+      align: "right",
+      lineGap: 0 
     });
-    doc.text(moneyText(row.amount), amountX, doc.y, { width: 110, align: "right" });
-    doc.moveDown(0.2);
+    
+    currentY += rowHeight;
   });
+  
+  doc.y = currentY + 2;
 }
 
-function signatureLine(doc, label) {
-  ensureSpace(doc, 42);
-  const startX = doc.x;
-  const y = doc.y + 18;
+function signatureLine(doc, label, x, y) {
+  ensureSpace(doc, 30);
+  const startX = x !== undefined ? x : doc.x;
+  const lineY = y !== undefined ? y + 18 : doc.y + 18;
   const width = 220;
   doc
-    .moveTo(startX, y)
-    .lineTo(startX + width, y)
+    .moveTo(startX, lineY)
+    .lineTo(startX + width, lineY)
     .stroke();
-  doc.font("Times-Roman").fontSize(9).text(label, startX, y + 4, { width });
-  doc.moveDown(2);
+  doc.font("Times-Roman").fontSize(9).text(label, startX, lineY + 4, { width });
+  if (x === undefined) {
+    doc.moveDown(2);
+  }
+}
+
+function dualSignatureLines(doc, label1, label2) {
+  ensureSpace(doc, 30);
+  const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+  const sigWidth = (pageWidth - 40) / 2;
+  const startY = doc.y;
+  const lineY = startY + 18;
+  
+  // Left signature line
+  doc.moveTo(doc.page.margins.left, lineY)
+    .lineTo(doc.page.margins.left + sigWidth, lineY)
+    .stroke();
+  doc.font("Times-Roman").fontSize(9).text(label1, doc.page.margins.left, lineY + 4);
+  
+  // Right signature line
+  doc.moveTo(doc.page.margins.left + sigWidth + 40, lineY)
+    .lineTo(doc.page.margins.left + sigWidth * 2 + 40, lineY)
+    .stroke();
+  doc.font("Times-Roman").fontSize(9).text(label2, doc.page.margins.left + sigWidth + 40, lineY + 4);
+  
+  doc.y = lineY + 20;
 }
 
 function buildContractPdf(doc, data) {
@@ -267,7 +306,6 @@ function buildContractPdf(doc, data) {
   const rightColumnWidth = pageWidth - leftColumnWidth - 20;
   const lineH = 18;
 
-  // Left column — dealer info
   doc.font("Times-Bold").fontSize(14).text(data.dealerName, doc.page.margins.left, headerTop, {
     width: leftColumnWidth,
     align: "left",
@@ -281,7 +319,6 @@ function buildContractPdf(doc, data) {
     align: "left",
   });
 
-  // Right column — contract title
   doc.font("Times-Bold").fontSize(16).text("VEHICLE PURCHASE CONTRACT", rightColumnX, headerTop, {
     width: rightColumnWidth,
     align: "right",
@@ -291,7 +328,6 @@ function buildContractPdf(doc, data) {
     align: "right",
   });
 
-  // VIN line directly below header, then vehicle info box
   doc.x = doc.page.margins.left;
   doc.y = headerTop + lineH * 3;
 
@@ -320,57 +356,89 @@ function buildContractPdf(doc, data) {
     ]);
   }
 
-  sectionTitle(doc, "Pricing Breakdown");
+  ensureSpace(doc, 24);
+  doc.moveDown(0.3);
+  doc.font("Times-Bold").fontSize(11).text("Pricing Breakdown", { align: "center" });
+  doc.moveDown(0.2);
+  doc.font("Times-Roman").fontSize(10.5);
+  
   pricingTable(doc, pricingRows);
 
-  sectionTitle(doc, "Minnesota Legal Disclosures");
-  plainParagraph(doc, "IMPORTANT: The information you see on the window form for this vehicle is part of this contract. Information on the window form overrides any contrary provisions in the contract of sale.");
-  doc.moveDown(0.4);
-  plainParagraph(doc, "Any motor vehicle sold to Purchaser by Dealer under this Order is sold WITHOUT WARRANTY, EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE as to its condition or the condition of any part thereof except as may be specifically provided in a separate writing furnished to Purchaser by Dealer. BUYER SHALL NOT BE ENTITLED TO RECOVER FROM THE SELLER ANY CONSEQUENTIAL DAMAGES, DAMAGES TO PROPERTY, DAMAGES FOR LOSS OF USE, LOSS OF TIME, LOSS OF PROFITS OR INCOME OR ANY OTHER INCIDENTAL DAMAGES. The Seller neither assumes nor authorizes any other person to assume for it any liability in connection with the sale of such vehicle. This disclaimer in no way affects the terms of any remaining manufacturer's warranty.");
-  doc.moveDown(0.4);
-  plainParagraph(doc, "POLLUTION CONTROL SYSTEM DISCLOSURE");
-  plainParagraph(doc, "In order to comply with the Minnesota Statutes, Section 325E.0951, no person may transfer a motor vehicle without providing a written disclosure to the transferee (buyer) certifying the condition of the pollution control system. Transferor (seller) hereby certifies, to the best of his/her knowledge, that the pollution control system on this vehicle, including the restricted gasoline pipe, has not been removed, altered, or rendered inoperative.");
+  // Minnesota Legal Disclosures - COMPACT with full width
+  const fullWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+  
+  ensureSpace(doc, 16);
+  doc.moveDown(0.2);
+  doc.font("Times-Bold").fontSize(11).text("Minnesota Legal Disclosures", doc.page.margins.left, doc.y, { width: fullWidth, align: "center" });
+  doc.moveDown(0.2);
+  
+  // IMPORTANT - full width
+  doc.font("Times-Bold").fontSize(8);
+  const importantX = doc.page.margins.left;
+  const importantY = doc.y;
+  doc.text("IMPORTANT: ", importantX, importantY, { continued: true, width: fullWidth });
+  doc.font("Times-Roman").text("The information you see on the window form for this vehicle is part of this contract. Information on the window form overrides any contrary provisions in the contract of sale.", { width: fullWidth, lineGap: 0 });
+  doc.moveDown(0.15);
+  
+  // Warranty disclaimer paragraph - full width, smaller font
+  doc.font("Times-Roman").fontSize(8);
+  doc.text("Any motor vehicle sold to Purchaser by Dealer under this Order is sold ", doc.page.margins.left, doc.y, { width: fullWidth, continued: true });
+  doc.font("Times-Bold").text("WITHOUT WARRANTY, EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE", { width: fullWidth, continued: true });
+  doc.font("Times-Roman").text(" as to its condition or the condition of any part thereof except as may be specifically provided in a separate writing furnished to Purchaser by Dealer. ", { width: fullWidth, continued: true });
+  doc.font("Times-Bold").text("BUYER SHALL NOT BE ENTITLED TO RECOVER FROM THE SELLER ANY CONSEQUENTIAL DAMAGES, DAMAGES TO PROPERTY, DAMAGES FOR LOSS OF USE, LOSS OF TIME, LOSS OF PROFITS OR INCOME OR ANY OTHER INCIDENTAL DAMAGES.", { width: fullWidth });
+  doc.font("Times-Roman").text(" The Seller neither assumes nor authorizes any other person to assume for it any liability in connection with the sale of such vehicle. This disclaimer in no way affects the terms of any remaining manufacturer's warranty.", { width: fullWidth, lineGap: 0 });
+  doc.moveDown(0.15);
+  
+  // Pollution Control header
+  doc.font("Times-Bold").fontSize(8.5).text("POLLUTION CONTROL SYSTEM DISCLOSURE", doc.page.margins.left, doc.y, { width: fullWidth });
+  doc.moveDown(0.1);
+  doc.font("Times-Roman").fontSize(8).text("In order to comply with the Minnesota Statutes, Section 325E.0951, no person may transfer a motor vehicle without providing a written disclosure to the transferee (buyer) certifying the condition of the pollution control system. Transferor (seller) hereby certifies, to the best of his/her knowledge, that the pollution control system on this vehicle, including the restricted gasoline pipe, has not been removed, altered, or rendered inoperative.", doc.page.margins.left, doc.y, { width: fullWidth, lineGap: 0 });
 
   if (safeText(data.warrantyNotes)) {
-    doc.moveDown(0.4);
-    doc.font("Times-Bold").text("Additional Terms / Warranty Exceptions:");
-    plainParagraph(doc, data.warrantyNotes);
+    doc.moveDown(0.15);
+    doc.font("Times-Bold").fontSize(8.5).text("Additional Terms / Warranty Exceptions:", doc.page.margins.left, doc.y, { width: fullWidth });
+    doc.moveDown(0.1);
+    doc.font("Times-Roman").fontSize(8).text(data.warrantyNotes, doc.page.margins.left, doc.y, { width: fullWidth, lineGap: 0 });
   }
 
-  sectionTitle(doc, "Signatures");
-  plainParagraph(doc, "By signing below, the buyer(s) acknowledge that they have read, understood, and agree to all terms, conditions, and disclosures contained in this contract. The buyer(s) confirm that the vehicle information listed above is accurate and that they are purchasing the vehicle in its current condition.");
-  doc.moveDown(0.6);
-  signatureLine(doc, "Buyer Signature");
-  signatureLine(doc, "Dealer Signature");
+  // Signatures Section - compact
+  ensureSpace(doc, 25);
+  doc.moveDown(0.3);
+  doc.font("Times-Bold").fontSize(11).text("Signatures", { align: "center" });
+  doc.moveDown(0.15);
+  doc.font("Times-Roman").fontSize(8).text("By signing below, the buyer(s) acknowledge that they have read, understood, and agree to all terms, conditions, and disclosures contained in this contract.", doc.page.margins.left, doc.y, { width: fullWidth, lineGap: 0 });
+  doc.moveDown(0.3);
+  
+  // Buyer and Dealer signatures side by side
+  dualSignatureLines(doc, "Buyer Signature", "Dealer Signature");
+  
   if (data.hasCobuyer === "yes") {
+    // Co-Buyer signature - force left margin
+    doc.x = doc.page.margins.left;
     signatureLine(doc, "Co-Buyer Signature");
   }
+  
+  // Date on left side - force left margin
+  doc.x = doc.page.margins.left;
   signatureLine(doc, "Date");
 }
 
-// Trust the first proxy
 app.set("trust proxy", 1);
 
-// Set EJS as the view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Middleware
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Make dealership phone number available to all templates
 app.locals.dealershipPhone = process.env.DEALERSHIP_PHONE;
 
-// Mount routers
 app.use("/admin", adminRouter);
 app.use("/inventory", inventoryRouter);
 
-// Routes
 app.get("/", async (req, res) => {
   try {
-    // Get featured cars with their primary images 
     const featuredCarsWithImages = await new Promise((resolve, reject) => {
       const query = `
         SELECT 
@@ -417,13 +485,11 @@ app.get("/contract", (req, res) => {
 
 app.post("/generate-contract", async (req, res) => {
   try {
-    // Handle both JSON (fetch API) and form-encoded (form submission) data
     const data = req.body || {};
     data.dealerName = "Dream Auto LLC";
     data.dealerAddress = "580 Dodge Ave NW Ste 4, Elk River, MN 55330";
     data.dealerPhone = process.env.DEALERSHIP_PHONE || "";
 
-    // Generate filename
     const date = new Date().toISOString().split("T")[0];
     const name = sanitizeFilenamePart(data.customerName);
     const vehicle = sanitizeFilenamePart(`${data.year || ""}_${data.make || ""}_${data.model || ""}`);
