@@ -285,6 +285,7 @@ function buildContractPdf(doc, data) {
     { label: "Public Safety Fee", amount: data.safety },
     { label: "State Filing Fee", amount: data.filing },
     { label: "Dealer Excise Tax", amount: data.excise },
+    { label: "Salvage Fee", amount: data.salvage },
   ];
 
   if (safeText(data.extraFee1Label)) {

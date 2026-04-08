@@ -259,6 +259,10 @@
                     <span class="text-gray-600">Excise Tax:</span>
                     <span class="font-medium">$<span id="p-excise">0.00</span></span>
                   </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Salvage Fee:</span>
+                    <span class="font-medium">$<span id="p-salvage">0.00</span></span>
+                  </div>
                 </div>
 
                 <!-- Extra fee rows -->
@@ -360,6 +364,7 @@
         safetyFee: 'p-safety',
         filingFee: 'p-filing',
         countyTax: 'p-excise',
+        salvageFee: 'p-salvage',
         totalPrice: 'p-total'
       };
 
@@ -455,6 +460,7 @@
         data.safety = document.getElementById('p-safety').textContent;
         data.filing = document.getElementById('p-filing').textContent;
         data.excise = document.getElementById('p-excise').textContent;
+        data.salvage = document.getElementById('p-salvage').textContent;
         
         // Add extra fees
         data.extraFee1Label = document.getElementById('extra-fee-1-label').value || '';
@@ -509,6 +515,7 @@
         data.safety = document.getElementById('p-safety').textContent;
         data.filing = document.getElementById('p-filing').textContent;
         data.excise = document.getElementById('p-excise').textContent;
+        data.salvage = document.getElementById('p-salvage').textContent;
 
         // Add extra fee rows
         data.extraFee1Label = document.getElementById('extra-fee-1-label').value || '';

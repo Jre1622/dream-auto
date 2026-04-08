@@ -148,6 +148,11 @@
           <input type="checkbox" id="anoka-transfer" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
           <label for="anoka-transfer" class="ml-2 block text-sm text-gray-700"> Dealer Excise Tax ($20 - required by some counties, charged by dealers) </label>
         </div>
+
+        <div class="flex items-center mt-2">
+          <input type="checkbox" id="salvage-fee" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+          <label for="salvage-fee" class="ml-2 block text-sm text-gray-700"> Salvage Fee ($35 - MN salvage title vehicle that has passed inspection) </label>
+        </div>
       </form>
 
       <!-- Results Section -->
@@ -177,6 +182,10 @@
           <div class="flex justify-between">
             <span class="text-gray-600">Dealer Excise Tax:</span>
             <span class="font-medium">$<span id="county-tax">0.00</span></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Salvage Fee:</span>
+            <span class="font-medium">$<span id="salvage-fee-result">0.00</span></span>
           </div>
           <div class="pt-3 border-t border-gray-200">
             <h3 class="text-sm font-medium text-gray-700 mb-2">Government Fees</h3>
@@ -246,6 +255,7 @@
       PUBLIC_SAFETY_FEE: 3.5,
       STATE_FILING_FEE: 13,
       LIEN_FEE: 2,
+      SALVAGE_FEE: 35,
       WHEELAGE_TAX: 0, // This will be updated dynamically
     };
 
@@ -287,7 +297,7 @@
     // Doc fee change handler
     document.getElementById("doc-fee").addEventListener("change", calculate);
 
-    // Doc fee toggle handler
+    // Doc fee toggle handler - visibility only; fee still applies to calculations
     document.getElementById("doc-fee-toggle").addEventListener("change", function() {
       const docFeeSection = document.getElementById("doc-fee-section");
       
@@ -306,11 +316,14 @@
     // Anoka County transfer tax change handler
     document.getElementById("anoka-transfer").addEventListener("change", calculate);
 
+    // Salvage fee change handler
+    document.getElementById("salvage-fee").addEventListener("change", calculate);
+
     // Registration input handler
     document.getElementById("registration-input").addEventListener("input", function (e) {
       const regFee = parseFloat(e.target.value);
 
-      if (regFee && regFee >= 0) {
+      if (!Number.isNaN(regFee) && regFee >= 0) {
         customRegistrationFee = regFee;
         this.classList.remove("border-red-500", "focus:ring-red-500", "focus:border-red-500");
         calculate();
@@ -431,6 +444,7 @@
         "final-total-price",
         "plate-fee",
         "county-tax",
+        "salvage-fee-result",
         "tech-surcharge",
         "title-fee",
         "transfer-tax",
@@ -442,9 +456,6 @@
       resultFields.forEach((field) => {
         document.getElementById(field).textContent = "0.00";
       });
-
-      // Reset wheelage
-      currentWheelage = 0;
     }
 
     function calculate() {
@@ -460,8 +471,15 @@
 
       const salePrice = parseFloat(saleInput.value) || 0;
       const totalPrice = parseFloat(totalInput.value) || 0;
+
+      if (salePrice <= 0 && totalPrice <= 0) {
+        resetCalculator();
+        return;
+      }
+
       const docFee = parseFloat(document.getElementById("doc-fee").value);
       const hasLien = document.getElementById("lien-fee").checked;
+      const hasSalvageFee = document.getElementById("salvage-fee").checked;
 
       // Update wheelage in FEES before calculating fixed fees
       FEES.WHEELAGE_TAX = currentWheelage;
@@ -479,8 +497,9 @@
 
       // Calculate variable fees
       const lienFee = hasLien ? FEES.LIEN_FEE : 0;
+      const salvageFee = hasSalvageFee ? FEES.SALVAGE_FEE : 0;
       const registrationFee = vehicleAge === "10+" ? FEES.REGISTRATION_FEE_10_PLUS : customRegistrationFee;
-      const totalFixedFees = fixedFees + docFee + lienFee + registrationFee;
+      const totalFixedFees = fixedFees + docFee + lienFee + salvageFee + registrationFee;
 
       let finalSalePrice, finalTotalPrice, salesTax;
 
@@ -517,6 +536,7 @@
         registrationFee,
         docFee,
         lienFee,
+        salvageFee,
         totalPrice: finalTotalPrice,
       });
     }
@@ -527,6 +547,7 @@
       document.getElementById("registration-fee").textContent = results.registrationFee.toFixed(2);
       document.getElementById("doc-fee-result").textContent = results.docFee.toFixed(2);
       document.getElementById("lien-fee-result").textContent = results.lienFee.toFixed(2);
+      document.getElementById("salvage-fee-result").textContent = results.salvageFee.toFixed(2);
       document.getElementById("final-total-price").textContent = results.totalPrice.toFixed(2);
 
       // Update government fees
@@ -556,6 +577,7 @@
         totalPrice: document.getElementById("final-total-price").textContent,
         docFee: document.getElementById("doc-fee-result").textContent,
         lienFee: document.getElementById("lien-fee-result").textContent,
+        salvageFee: document.getElementById("salvage-fee-result").textContent,
         registrationFee: document.getElementById("registration-fee").textContent,
         countyTax: document.getElementById("county-tax").textContent,
         plateFee: document.getElementById("plate-fee").textContent,
@@ -568,7 +590,8 @@
         county: countySelect.value || "",
         vehicleAge: document.getElementById("vehicle-age").value,
         hasLien: document.getElementById("lien-fee").checked ? "1" : "0",
-        hasExcise: document.getElementById("anoka-transfer").checked ? "1" : "0"
+        hasExcise: document.getElementById("anoka-transfer").checked ? "1" : "0",
+        hasSalvageFee: document.getElementById("salvage-fee").checked ? "1" : "0"
       });
       window.open("/contract?" + params.toString(), "_blank");
     });
