@@ -10,7 +10,7 @@
     <title>Purchase Contract Generator</title>
     <style>
       @media print {
-        header, footer, #generate-btn, #print-btn, #toggle-disclosures, .relative.inline-flex.items-center.cursor-pointer {
+        header, footer, #generate-btn, #toggle-disclosures, .relative.inline-flex.items-center.cursor-pointer {
           display: none !important;
         }
         body {
@@ -315,12 +315,9 @@
             </div>
 
             <!-- Generate Button -->
-            <div class="flex flex-col sm:flex-row gap-3">
-              <button type="submit" id="generate-btn" class="flex-1 px-6 py-3 bg-green-600 text-white font-semibold text-lg rounded-lg hover:bg-green-700 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+            <div>
+              <button type="submit" id="generate-btn" class="w-full px-6 py-3 bg-green-600 text-white font-semibold text-lg rounded-lg hover:bg-green-700 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
                 Generate & Download PDF
-              </button>
-              <button type="button" id="print-btn" class="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold text-lg rounded-lg hover:bg-blue-700 transition-colors shadow-lg">
-                Print Contract
               </button>
             </div>
             <div id="status" class="mt-3 text-center text-sm hidden"></div>
@@ -430,60 +427,6 @@
         }
 
         this.disabled = false;
-      });
-
-      // Print button handler - opens PDF in new tab via POST form submission
-      // This avoids pop-up blockers since it's a direct form submission
-      document.getElementById('print-btn').addEventListener('click', function() {
-        // Create a hidden form that posts to /generate-contract
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/generate-contract';
-        form.target = '_blank';
-        
-        // Gather all form data
-        const formData = new FormData(document.getElementById('contract-form'));
-        const data = Object.fromEntries(formData.entries());
-        
-        // Add pricing data
-        data.salePrice = document.getElementById('p-sale-price').textContent;
-        data.salesTax = document.getElementById('p-sales-tax').textContent;
-        data.totalPrice = document.getElementById('p-total').textContent;
-        data.docFee = document.getElementById('p-doc-fee').textContent;
-        data.lienFee = document.getElementById('p-lien-fee').textContent;
-        data.regFee = document.getElementById('p-reg-fee').textContent;
-        data.titleFee = document.getElementById('p-title-fee').textContent;
-        data.plateFee = document.getElementById('p-plate-fee').textContent;
-        data.wheelage = document.getElementById('p-wheelage').textContent;
-        data.transfer = document.getElementById('p-transfer').textContent;
-        data.tech = document.getElementById('p-tech').textContent;
-        data.safety = document.getElementById('p-safety').textContent;
-        data.filing = document.getElementById('p-filing').textContent;
-        data.excise = document.getElementById('p-excise').textContent;
-        data.salvage = document.getElementById('p-salvage').textContent;
-        
-        // Add extra fees
-        data.extraFee1Label = document.getElementById('extra-fee-1-label').value || '';
-        data.extraFee1Amount = document.getElementById('extra-fee-1-amount').value || '';
-        data.extraFee2Label = document.getElementById('extra-fee-2-label').value || '';
-        data.extraFee2Amount = document.getElementById('extra-fee-2-amount').value || '';
-        
-        // Add toggles
-        data.hasCobuyer = document.getElementById('has-cobuyer').checked ? 'yes' : 'no';
-        data.hasLienholder = document.getElementById('has-lienholder').checked ? 'yes' : 'no';
-        
-        // Add all data as hidden inputs
-        Object.entries(data).forEach(([key, value]) => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = value;
-          form.appendChild(input);
-        });
-        
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
       });
 
       // Form submission
