@@ -205,6 +205,11 @@
             <div class="mb-8">
               <h2 class="text-lg font-semibold text-gray-800 mb-4">Pricing Breakdown</h2>
 
+              <!-- Out-of-State Notice -->
+              <div id="out-of-state-notice" class="hidden mb-4 p-3 bg-amber-50 border border-amber-300 rounded-lg text-sm text-amber-800">
+                <strong>Out-of-State Sale:</strong> This is an out-of-state sale. All Minnesota taxes, registration, and government fees are excluded. The buyer is responsible for tax, title, and registration in their home state.
+              </div>
+
               <div class="bg-gray-50 rounded-lg p-4">
                 <div class="grid grid-cols-2 gap-3 text-sm">
                   <div class="flex justify-between">
@@ -347,6 +352,13 @@
 
       // Pre-fill pricing from URL params
       const params = new URLSearchParams(window.location.search);
+
+      // Show out-of-state notice if applicable
+      const isOutOfState = params.get("isOutOfState") === "1";
+      if (isOutOfState) {
+        document.getElementById("out-of-state-notice").classList.remove("hidden");
+      }
+
       const pricingFields = {
         salePrice: 'p-sale-price',
         salesTax: 'p-sales-tax',
@@ -469,6 +481,7 @@
         // Add toggle states
         data.hasCobuyer = document.getElementById('has-cobuyer').checked ? 'yes' : 'no';
         data.hasLienholder = document.getElementById('has-lienholder').checked ? 'yes' : 'no';
+        data.isOutOfState = isOutOfState ? '1' : '0';
 
         try {
           const res = await fetch('/generate-contract', {

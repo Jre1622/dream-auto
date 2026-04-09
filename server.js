@@ -365,6 +365,22 @@ function buildContractPdf(doc, data) {
   
   pricingTable(doc, pricingRows);
 
+  // Out-of-State Sale Disclosure
+  if (data.isOutOfState === "1") {
+    ensureSpace(doc, 40);
+    doc.moveDown(0.3);
+    doc.rect(doc.page.margins.left, doc.y, doc.page.width - doc.page.margins.left - doc.page.margins.right, 48).stroke();
+    const noticeY = doc.y + 6;
+    const noticeWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right - 16;
+    doc.font("Times-Bold").fontSize(9).text("OUT-OF-STATE SALE DISCLOSURE", doc.page.margins.left + 8, noticeY, { width: noticeWidth });
+    doc.font("Times-Roman").fontSize(8.5).text(
+      "This is an out-of-state sale. All Minnesota taxes, registration fees, and government fees have been excluded from this transaction. The buyer is solely responsible for paying all applicable taxes, title fees, and registration fees in their home state.",
+      doc.page.margins.left + 8, noticeY + 14, { width: noticeWidth, lineGap: 1 }
+    );
+    doc.y = noticeY + 42;
+    doc.x = doc.page.margins.left;
+  }
+
   // Minnesota Legal Disclosures - COMPACT with full width
   const fullWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
   

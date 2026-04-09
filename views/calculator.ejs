@@ -60,34 +60,41 @@
           </div>
         </div>
 
-        <!-- Vehicle Details -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Out-of-State Sale Toggle -->
+        <div class="flex items-center mt-2">
+          <input type="checkbox" id="out-of-state" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+          <label for="out-of-state" class="ml-2 block text-sm text-gray-700"> Out-of-State Sale — Buyer is registering vehicle outside Minnesota </label>
+        </div>
+
+        <!-- Doc Fee (always shown, not MN-specific) -->
+        <div class="doc-fee">
+          <div class="flex items-center justify-between mb-1">
+            <label for="doc-fee" class="block text-sm font-medium text-gray-700"> Documentation Fee </label>
+            <div class="flex items-center">
+              <input type="checkbox" id="doc-fee-toggle" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+              <label for="doc-fee-toggle" class="ml-2 block text-xs text-gray-500"> Fee </label>
+            </div>
+          </div>
+          <div id="doc-fee-section" class="hidden">
+            <select id="doc-fee" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+              <option value="0">$0</option>
+              <option value="100">$100</option>
+              <option value="200">$200</option>
+              <option value="275">$275</option>
+              <option value="300">$300</option>
+              <option value="350" selected>$350</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- MN-Specific Vehicle Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mn-field">
           <div class="vehicle-age">
             <label for="vehicle-age" class="block text-sm font-medium text-gray-700 mb-1"> Vehicle Age </label>
             <select id="vehicle-age" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
               <option value="10+">10 years or older</option>
               <option value="<10">Less than 10 years</option>
             </select>
-          </div>
-
-          <div class="doc-fee">
-            <div class="flex items-center justify-between mb-1">
-              <label for="doc-fee" class="block text-sm font-medium text-gray-700"> Documentation Fee </label>
-              <div class="flex items-center">
-                <input type="checkbox" id="doc-fee-toggle" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                <label for="doc-fee-toggle" class="ml-2 block text-xs text-gray-500"> Fee </label>
-              </div>
-            </div>
-            <div id="doc-fee-section" class="hidden">
-              <select id="doc-fee" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <option value="0">$0</option>
-                <option value="100">$100</option>
-                <option value="200">$200</option>
-                <option value="275">$275</option>
-                <option value="300">$300</option>
-                <option value="350" selected>$350</option>
-              </select>
-            </div>
           </div>
 
           <div class="county-selector">
@@ -101,7 +108,7 @@
         </div>
 
         <!-- Registration Fee Section (initially hidden) -->
-        <div id="registration-section" class="hidden mt-6">
+        <div id="registration-section" class="hidden mt-6 mn-field">
           <div class="bg-blue-50 rounded-md p-4 border border-blue-200">
             <div class="flex items-start space-x-3">
               <div class="flex-shrink-0">
@@ -138,18 +145,18 @@
         </div>
 
         <!-- Lien Checkbox -->
-        <div class="flex items-center">
+        <div class="flex items-center mn-field">
           <input type="checkbox" id="lien-fee" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
           <label for="lien-fee" class="ml-2 block text-sm text-gray-700"> Vehicle has a lien ($2 fee) </label>
         </div>
 
         <!-- Excise Tax | Counties near the cities? -->
-        <div class="flex items-center mt-2">
+        <div class="flex items-center mt-2 mn-field">
           <input type="checkbox" id="anoka-transfer" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
           <label for="anoka-transfer" class="ml-2 block text-sm text-gray-700"> Dealer Excise Tax ($20 - required by some counties, charged by dealers) </label>
         </div>
 
-        <div class="flex items-center mt-2">
+        <div class="flex items-center mt-2 mn-field">
           <input type="checkbox" id="salvage-fee" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
           <label for="salvage-fee" class="ml-2 block text-sm text-gray-700"> Salvage Fee ($35 - MN salvage title vehicle that has passed inspection) </label>
         </div>
@@ -187,7 +194,12 @@
             <span class="text-gray-600">Salvage Fee:</span>
             <span class="font-medium">$<span id="salvage-fee-result">0.00</span></span>
           </div>
-          <div class="pt-3 border-t border-gray-200">
+          <!-- Out-of-State Notice (shown when toggle is on) -->
+          <div id="out-of-state-notice" class="hidden p-3 bg-amber-50 border border-amber-300 rounded-lg text-sm text-amber-800">
+            <strong>Out-of-State Sale:</strong> All Minnesota taxes, registration, and government fees are excluded. The buyer is responsible for tax, title, and registration in their home state.
+          </div>
+
+          <div class="pt-3 border-t border-gray-200 mn-field">
             <h3 class="text-sm font-medium text-gray-700 mb-2">Government Fees</h3>
             <div class="space-y-2">
               <div class="flex justify-between">
@@ -258,6 +270,45 @@
       SALVAGE_FEE: 35,
       WHEELAGE_TAX: 0, // This will be updated dynamically
     };
+
+    // Out-of-State toggle handler
+    const outOfStateCheckbox = document.getElementById("out-of-state");
+    const mnFields = document.querySelectorAll(".mn-field");
+    const outOfStateNotice = document.getElementById("out-of-state-notice");
+
+    outOfStateCheckbox.addEventListener("change", function() {
+      if (this.checked) {
+        // Hide MN-specific fields
+        mnFields.forEach(el => el.classList.add("hidden"));
+        outOfStateNotice.classList.remove("hidden");
+        // Disable MN inputs so they don't affect calculations
+        document.getElementById("vehicle-age").disabled = true;
+        document.getElementById("county").disabled = true;
+        document.getElementById("lien-fee").disabled = true;
+        document.getElementById("anoka-transfer").disabled = true;
+        document.getElementById("salvage-fee").disabled = true;
+        document.getElementById("registration-input").disabled = true;
+      } else {
+        // Show MN-specific fields
+        mnFields.forEach(el => el.classList.remove("hidden"));
+        outOfStateNotice.classList.add("hidden");
+        // Re-enable MN inputs
+        document.getElementById("vehicle-age").disabled = false;
+        document.getElementById("county").disabled = false;
+        document.getElementById("lien-fee").disabled = false;
+        document.getElementById("anoka-transfer").disabled = false;
+        document.getElementById("salvage-fee").disabled = false;
+        document.getElementById("registration-input").disabled = false;
+        // Restore registration section visibility based on vehicle age
+        const regSection = document.getElementById("registration-section");
+        if (document.getElementById("vehicle-age").value === "<10") {
+          regSection.classList.remove("hidden");
+        } else {
+          regSection.classList.add("hidden");
+        }
+      }
+      calculate();
+    });
 
     // Input handling for sale price and total price
     const saleInput = document.getElementById("sale-price");
@@ -459,6 +510,42 @@
     }
 
     function calculate() {
+      const isOutOfState = outOfStateCheckbox.checked;
+
+      if (isOutOfState) {
+        // Out-of-state: only sale price + doc fee
+        const salePrice = parseFloat(saleInput.value) || 0;
+        const totalPrice = parseFloat(totalInput.value) || 0;
+        const docFee = parseFloat(document.getElementById("doc-fee").value) || 0;
+
+        if (salePrice <= 0 && totalPrice <= 0) {
+          resetCalculator();
+          return;
+        }
+
+        let finalSalePrice, finalTotalPrice;
+
+        if (salePrice > 0) {
+          finalSalePrice = salePrice;
+          finalTotalPrice = salePrice + docFee;
+        } else {
+          finalTotalPrice = totalPrice;
+          finalSalePrice = totalPrice - docFee;
+        }
+
+        updateDisplay({
+          salePrice: finalSalePrice,
+          salesTax: 0,
+          registrationFee: 0,
+          docFee: docFee,
+          lienFee: 0,
+          salvageFee: 0,
+          totalPrice: finalTotalPrice,
+          isOutOfState: true,
+        });
+        return;
+      }
+
       const vehicleAge = document.getElementById("vehicle-age").value;
 
       // Check if registration fee is needed but not provided
@@ -550,15 +637,27 @@
       document.getElementById("salvage-fee-result").textContent = results.salvageFee.toFixed(2);
       document.getElementById("final-total-price").textContent = results.totalPrice.toFixed(2);
 
-      // Update government fees
-      document.getElementById("plate-fee").textContent = FEES.LICENSE_PLATE_FEE.toFixed(2);
-      document.getElementById("county-tax").textContent = (document.getElementById("anoka-transfer").checked ? FEES.DEALER_EXCISE_TAX : 0).toFixed(2);
-      document.getElementById("tech-surcharge").textContent = FEES.TECHNOLOGY_SURCHARGE.toFixed(2);
-      document.getElementById("title-fee").textContent = FEES.TITLE_FEE.toFixed(2);
-      document.getElementById("transfer-tax").textContent = FEES.TRANSFER_TAX.toFixed(2);
-      document.getElementById("safety-fee").textContent = FEES.PUBLIC_SAFETY_FEE.toFixed(2);
-      document.getElementById("filing-fee").textContent = FEES.STATE_FILING_FEE.toFixed(2);
-      document.getElementById("wheelage-tax").textContent = FEES.WHEELAGE_TAX.toFixed(2);
+      if (results.isOutOfState) {
+        // Zero out all government fees for out-of-state
+        document.getElementById("plate-fee").textContent = "0.00";
+        document.getElementById("county-tax").textContent = "0.00";
+        document.getElementById("tech-surcharge").textContent = "0.00";
+        document.getElementById("title-fee").textContent = "0.00";
+        document.getElementById("transfer-tax").textContent = "0.00";
+        document.getElementById("safety-fee").textContent = "0.00";
+        document.getElementById("filing-fee").textContent = "0.00";
+        document.getElementById("wheelage-tax").textContent = "0.00";
+      } else {
+        // Update government fees
+        document.getElementById("plate-fee").textContent = FEES.LICENSE_PLATE_FEE.toFixed(2);
+        document.getElementById("county-tax").textContent = (document.getElementById("anoka-transfer").checked ? FEES.DEALER_EXCISE_TAX : 0).toFixed(2);
+        document.getElementById("tech-surcharge").textContent = FEES.TECHNOLOGY_SURCHARGE.toFixed(2);
+        document.getElementById("title-fee").textContent = FEES.TITLE_FEE.toFixed(2);
+        document.getElementById("transfer-tax").textContent = FEES.TRANSFER_TAX.toFixed(2);
+        document.getElementById("safety-fee").textContent = FEES.PUBLIC_SAFETY_FEE.toFixed(2);
+        document.getElementById("filing-fee").textContent = FEES.STATE_FILING_FEE.toFixed(2);
+        document.getElementById("wheelage-tax").textContent = FEES.WHEELAGE_TAX.toFixed(2);
+      }
 
       // Enable contract button when we have a valid total
       const contractBtn = document.getElementById("generate-contract-btn");
@@ -571,6 +670,7 @@
 
     // Generate Contract button handler
     document.getElementById("generate-contract-btn").addEventListener("click", function() {
+      const isOutOfState = outOfStateCheckbox.checked;
       const params = new URLSearchParams({
         salePrice: document.getElementById("sale-price-result").textContent,
         salesTax: document.getElementById("sales-tax").textContent,
@@ -591,7 +691,8 @@
         vehicleAge: document.getElementById("vehicle-age").value,
         hasLien: document.getElementById("lien-fee").checked ? "1" : "0",
         hasExcise: document.getElementById("anoka-transfer").checked ? "1" : "0",
-        hasSalvageFee: document.getElementById("salvage-fee").checked ? "1" : "0"
+        hasSalvageFee: document.getElementById("salvage-fee").checked ? "1" : "0",
+        isOutOfState: isOutOfState ? "1" : "0"
       });
       window.open("/contract?" + params.toString(), "_blank");
     });
