@@ -66,6 +66,12 @@
           <label for="out-of-state" class="ml-2 block text-sm text-gray-700"> Out-of-State Sale — Buyer is registering vehicle outside Minnesota </label>
         </div>
 
+        <!-- Wholesale Sale Toggle -->
+        <div class="flex items-center mt-2">
+          <input type="checkbox" id="wholesale" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+          <label for="wholesale" class="ml-2 block text-sm text-gray-700"> Wholesale Sale — Dealer-to-dealer or wholesale transaction </label>
+        </div>
+
         <!-- Doc Fee (always shown, not MN-specific) -->
         <div class="doc-fee">
           <div class="flex items-center justify-between mb-1">
@@ -199,6 +205,11 @@
             <strong>Out-of-State Sale:</strong> All Minnesota taxes, registration, and government fees are excluded. The buyer is responsible for tax, title, and registration in their home state.
           </div>
 
+          <!-- Wholesale Sale Notice (shown when toggle is on) -->
+          <div id="wholesale-notice" class="hidden p-3 bg-amber-50 border border-amber-300 rounded-lg text-sm text-amber-800">
+            <strong>Wholesale Sale:</strong> This is a wholesale transaction. Standard Minnesota retail taxes, registration, and government fees are not applied.
+          </div>
+
           <div class="pt-3 border-t border-gray-200 mn-field">
             <h3 class="text-sm font-medium text-gray-700 mb-2">Government Fees</h3>
             <div class="space-y-2">
@@ -273,39 +284,61 @@
 
     // Out-of-State toggle handler
     const outOfStateCheckbox = document.getElementById("out-of-state");
+    const wholesaleCheckbox = document.getElementById("wholesale");
     const mnFields = document.querySelectorAll(".mn-field");
     const outOfStateNotice = document.getElementById("out-of-state-notice");
+    const wholesaleNotice = document.getElementById("wholesale-notice");
+
+    function hideMnFields() {
+      mnFields.forEach(el => el.classList.add("hidden"));
+      document.getElementById("vehicle-age").disabled = true;
+      document.getElementById("county").disabled = true;
+      document.getElementById("lien-fee").disabled = true;
+      document.getElementById("anoka-transfer").disabled = true;
+      document.getElementById("salvage-fee").disabled = true;
+      document.getElementById("registration-input").disabled = true;
+    }
+
+    function showMnFields() {
+      mnFields.forEach(el => el.classList.remove("hidden"));
+      document.getElementById("vehicle-age").disabled = false;
+      document.getElementById("county").disabled = false;
+      document.getElementById("lien-fee").disabled = false;
+      document.getElementById("anoka-transfer").disabled = false;
+      document.getElementById("salvage-fee").disabled = false;
+      document.getElementById("registration-input").disabled = false;
+      // Restore registration section visibility based on vehicle age
+      const regSection = document.getElementById("registration-section");
+      if (document.getElementById("vehicle-age").value === "<10") {
+        regSection.classList.remove("hidden");
+      } else {
+        regSection.classList.add("hidden");
+      }
+    }
 
     outOfStateCheckbox.addEventListener("change", function() {
       if (this.checked) {
-        // Hide MN-specific fields
-        mnFields.forEach(el => el.classList.add("hidden"));
+        wholesaleCheckbox.checked = false;
+        wholesaleNotice.classList.add("hidden");
+        hideMnFields();
         outOfStateNotice.classList.remove("hidden");
-        // Disable MN inputs so they don't affect calculations
-        document.getElementById("vehicle-age").disabled = true;
-        document.getElementById("county").disabled = true;
-        document.getElementById("lien-fee").disabled = true;
-        document.getElementById("anoka-transfer").disabled = true;
-        document.getElementById("salvage-fee").disabled = true;
-        document.getElementById("registration-input").disabled = true;
       } else {
-        // Show MN-specific fields
-        mnFields.forEach(el => el.classList.remove("hidden"));
+        showMnFields();
         outOfStateNotice.classList.add("hidden");
-        // Re-enable MN inputs
-        document.getElementById("vehicle-age").disabled = false;
-        document.getElementById("county").disabled = false;
-        document.getElementById("lien-fee").disabled = false;
-        document.getElementById("anoka-transfer").disabled = false;
-        document.getElementById("salvage-fee").disabled = false;
-        document.getElementById("registration-input").disabled = false;
-        // Restore registration section visibility based on vehicle age
-        const regSection = document.getElementById("registration-section");
-        if (document.getElementById("vehicle-age").value === "<10") {
-          regSection.classList.remove("hidden");
-        } else {
-          regSection.classList.add("hidden");
-        }
+      }
+      calculate();
+    });
+
+    // Wholesale toggle handler
+    wholesaleCheckbox.addEventListener("change", function() {
+      if (this.checked) {
+        outOfStateCheckbox.checked = false;
+        outOfStateNotice.classList.add("hidden");
+        hideMnFields();
+        wholesaleNotice.classList.remove("hidden");
+      } else {
+        showMnFields();
+        wholesaleNotice.classList.add("hidden");
       }
       calculate();
     });
@@ -511,9 +544,10 @@
 
     function calculate() {
       const isOutOfState = outOfStateCheckbox.checked;
+      const isWholesale = wholesaleCheckbox.checked;
 
-      if (isOutOfState) {
-        // Out-of-state: only sale price + doc fee
+      if (isOutOfState || isWholesale) {
+        // Out-of-state or wholesale: only sale price + doc fee
         const salePrice = parseFloat(saleInput.value) || 0;
         const totalPrice = parseFloat(totalInput.value) || 0;
         const docFee = parseFloat(document.getElementById("doc-fee").value) || 0;
@@ -692,7 +726,8 @@
         hasLien: document.getElementById("lien-fee").checked ? "1" : "0",
         hasExcise: document.getElementById("anoka-transfer").checked ? "1" : "0",
         hasSalvageFee: document.getElementById("salvage-fee").checked ? "1" : "0",
-        isOutOfState: isOutOfState ? "1" : "0"
+        isOutOfState: isOutOfState ? "1" : "0",
+        isWholesale: wholesaleCheckbox.checked ? "1" : "0"
       });
       window.open("/contract?" + params.toString(), "_blank");
     });

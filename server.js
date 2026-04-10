@@ -381,6 +381,22 @@ function buildContractPdf(doc, data) {
     doc.x = doc.page.margins.left;
   }
 
+  // Wholesale Sale Disclosure
+  if (data.isWholesale === "1") {
+    ensureSpace(doc, 40);
+    doc.moveDown(0.3);
+    doc.rect(doc.page.margins.left, doc.y, doc.page.width - doc.page.margins.left - doc.page.margins.right, 48).stroke();
+    const noticeY = doc.y + 6;
+    const noticeWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right - 16;
+    doc.font("Times-Bold").fontSize(9).text("WHOLESALE SALE DISCLOSURE", doc.page.margins.left + 8, noticeY, { width: noticeWidth });
+    doc.font("Times-Roman").fontSize(8.5).text(
+      "This is a wholesale transaction. Standard Minnesota retail taxes, registration fees, and government fees are not applied to this sale.",
+      doc.page.margins.left + 8, noticeY + 14, { width: noticeWidth, lineGap: 1 }
+    );
+    doc.y = noticeY + 42;
+    doc.x = doc.page.margins.left;
+  }
+
   // Minnesota Legal Disclosures - COMPACT with full width
   const fullWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
   

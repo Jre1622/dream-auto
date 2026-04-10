@@ -210,6 +210,11 @@
                 <strong>Out-of-State Sale:</strong> This is an out-of-state sale. All Minnesota taxes, registration, and government fees are excluded. The buyer is responsible for tax, title, and registration in their home state.
               </div>
 
+              <!-- Wholesale Sale Notice -->
+              <div id="wholesale-notice" class="hidden mb-4 p-3 bg-amber-50 border border-amber-300 rounded-lg text-sm text-amber-800">
+                <strong>Wholesale Sale:</strong> This is a wholesale transaction. Standard Minnesota retail taxes, registration, and government fees are not applied.
+              </div>
+
               <div class="bg-gray-50 rounded-lg p-4">
                 <div class="grid grid-cols-2 gap-3 text-sm">
                   <div class="flex justify-between">
@@ -359,6 +364,12 @@
         document.getElementById("out-of-state-notice").classList.remove("hidden");
       }
 
+      // Show wholesale notice if applicable
+      const isWholesale = params.get("isWholesale") === "1";
+      if (isWholesale) {
+        document.getElementById("wholesale-notice").classList.remove("hidden");
+      }
+
       const pricingFields = {
         salePrice: 'p-sale-price',
         salesTax: 'p-sales-tax',
@@ -482,6 +493,7 @@
         data.hasCobuyer = document.getElementById('has-cobuyer').checked ? 'yes' : 'no';
         data.hasLienholder = document.getElementById('has-lienholder').checked ? 'yes' : 'no';
         data.isOutOfState = isOutOfState ? '1' : '0';
+        data.isWholesale = isWholesale ? '1' : '0';
 
         try {
           const res = await fetch('/generate-contract', {
