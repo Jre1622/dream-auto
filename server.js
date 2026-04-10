@@ -288,12 +288,6 @@ function buildContractPdf(doc, data) {
     { label: "Salvage Fee", amount: data.salvage },
   ];
 
-  if (safeText(data.extraFee1Label)) {
-    pricingRows.push({ label: safeText(data.extraFee1Label), amount: data.extraFee1Amount });
-  }
-  if (safeText(data.extraFee2Label)) {
-    pricingRows.push({ label: safeText(data.extraFee2Label), amount: data.extraFee2Amount });
-  }
   pricingRows.push({ label: "Total Out-the-Door Price", amount: data.totalPrice, bold: true });
 
   doc.info.Title = "Vehicle Purchase Contract";

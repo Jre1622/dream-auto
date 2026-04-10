@@ -275,19 +275,6 @@
                   </div>
                 </div>
 
-                <!-- Extra fee rows -->
-                <div class="border-t border-gray-200 mt-3 pt-3">
-                  <p class="text-xs text-gray-500 mb-2">Additional fees (optional):</p>
-                  <div class="flex gap-2 mb-2">
-                    <input type="text" id="extra-fee-1-label" class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Fee name (e.g. Gap Insurance)" />
-                    <input type="text" id="extra-fee-1-amount" class="w-24 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="$0.00" />
-                  </div>
-                  <div class="flex gap-2">
-                    <input type="text" id="extra-fee-2-label" class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Fee name (e.g. Paint Protection)" />
-                    <input type="text" id="extra-fee-2-amount" class="w-24 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="$0.00" />
-                  </div>
-                </div>
-
                 <div class="flex justify-between col-span-2 pt-2 border-t border-gray-200 mt-1">
                     <span class="font-semibold text-gray-800">Total:</span>
                     <span class="font-bold text-lg">$<span id="p-total">0.00</span></span>
@@ -482,12 +469,6 @@
         data.filing = document.getElementById('p-filing').textContent;
         data.excise = document.getElementById('p-excise').textContent;
         data.salvage = document.getElementById('p-salvage').textContent;
-
-        // Add extra fee rows
-        data.extraFee1Label = document.getElementById('extra-fee-1-label').value || '';
-        data.extraFee1Amount = document.getElementById('extra-fee-1-amount').value || '';
-        data.extraFee2Label = document.getElementById('extra-fee-2-label').value || '';
-        data.extraFee2Amount = document.getElementById('extra-fee-2-amount').value || '';
 
         // Add toggle states
         data.hasCobuyer = document.getElementById('has-cobuyer').checked ? 'yes' : 'no';
