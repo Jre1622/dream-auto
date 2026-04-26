@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= car ? `${car.year} ${car.make} ${car.model}` : 'Vehicle Details' %> - Dream Auto</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/output.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   </head>
   <body class="bg-gray-50">
@@ -12,23 +12,32 @@
 
     <!-- Header Navigation -->
     <div class="bg-white border-b">
-      <div class="max-w-7xl mx-auto px-4 lg:px-8 py-4">
-        <div class="flex items-center justify-between">
+      <div class="max-w-7xl mx-auto px-4 lg:px-8 py-3">
+        <div class="flex items-center justify-between gap-3">
           <!-- Back Button -->
-          <a href="/inventory" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
-            <i class="fas fa-chevron-left"></i>
-            <span>Back to Inventory</span>
+          <a href="/inventory" class="inline-flex items-center gap-2 text-sm sm:text-base text-gray-600 hover:text-gray-900 transition-colors shrink-0">
+            <i class="fas fa-chevron-left text-sm"></i>
+            <span>Back</span>
           </a>
 
           <!-- Status Badges -->
-          <div class="flex items-center gap-2">
+          <div class="flex items-center justify-end gap-2 min-w-0">
             <% if (car && car.is_featured) { %>
-            <span class="bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-1 rounded-full"> <i class="fas fa-star mr-1"></i>Featured </span>
-            <% } %> <% if (car) { %> <% if (car.sold) { %>
-            <span class="bg-red-100 text-red-800 text-sm font-medium px-3 py-1 rounded-full"> <i class="fas fa-times-circle mr-1"></i>Sold </span>
+            <span class="inline-flex items-center bg-yellow-50 text-yellow-800 text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
+              <i class="fas fa-star mr-1"></i>Featured
+            </span>
+            <% } %>
+            <% if (car) { %>
+            <% if (car.sold) { %>
+            <span class="inline-flex items-center bg-red-50 text-red-800 text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
+              <i class="fas fa-times-circle mr-1"></i>Sold
+            </span>
             <% } else { %>
-            <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full"> <i class="fas fa-check-circle mr-1"></i>Available </span>
-            <% } %> <% } %>
+            <span class="inline-flex items-center bg-green-50 text-green-800 text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
+              <i class="fas fa-check-circle mr-1"></i>Available
+            </span>
+            <% } %>
+            <% } %>
           </div>
         </div>
       </div>
@@ -146,6 +155,34 @@
                   <p class="font-medium"><%= car && car.transmission ? car.transmission : 'N/A' %></p>
                 </div>
               </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-road text-blue-500"></i>
+                <div>
+                  <p class="text-sm text-gray-500">Drive</p>
+                  <p class="font-medium"><%= car && car.drive_type ? car.drive_type : 'N/A' %></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-gas-pump text-blue-500"></i>
+                <div>
+                  <p class="text-sm text-gray-500">Fuel</p>
+                  <p class="font-medium"><%= car && car.fuel_type ? car.fuel_type : 'N/A' %></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-palette text-blue-500"></i>
+                <div>
+                  <p class="text-sm text-gray-500">Color</p>
+                  <p class="font-medium"><%= car && car.exterior_color ? car.exterior_color : 'N/A' %></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-car text-blue-500"></i>
+                <div>
+                  <p class="text-sm text-gray-500">Body</p>
+                  <p class="font-medium"><%= car && car.body_style ? car.body_style : 'N/A' %></p>
+                </div>
+              </div>
             </div>
 
             <!-- VIN Section -->
@@ -154,6 +191,13 @@
               <p class="font-mono text-sm bg-gray-100 px-3 py-2 rounded"><%= car ? car.vin : 'N/A' %></p>
             </div>
           </div>
+
+          <% if (car && car.description) { %>
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Notes</h3>
+            <p class="text-gray-700 whitespace-pre-line"><%= car.description %></p>
+          </div>
+          <% } %>
 
           <!-- Features -->
           <% if (car && car.features) { %>
@@ -170,23 +214,6 @@
           </div>
           <% } %>
 
-          <!-- Carfax Report -->
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Vehicle History</h3>
-            <% if (car && car.carfax_url) { %>
-            <a href="<%= car.carfax_url %>" target="_blank" class="block w-full bg-orange-500 text-white text-center py-3 rounded-lg hover:bg-orange-600 transition-colors">
-              <i class="fas fa-file-alt mr-2"></i>
-              View Carfax Report
-            </a>
-            <% } else { %>
-            <div class="block w-full bg-gray-100 text-gray-500 text-center py-3 rounded-lg cursor-not-allowed">
-              <i class="fas fa-clock mr-2"></i>
-              Carfax Report Coming Soon
-            </div>
-            <p class="text-sm text-gray-500 mt-2 text-center">Vehicle history report will be available shortly</p>
-            <% } %>
-          </div>
-
           <!-- Contact Actions -->
           <div class="bg-white rounded-lg shadow-sm p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Interested in this vehicle?</h3>
@@ -195,26 +222,17 @@
                 <i class="fas fa-phone mr-2"></i>
                 Call Now
               </a>
-              <button class="w-full border border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition-colors">
+              <a href="mailto:DreamAutosMN@gmail.com?subject=<%= encodeURIComponent(`Interested in ${car.year} ${car.make} ${car.model}`) %>" class="w-full border border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition-colors inline-flex items-center justify-center">
                 <i class="fas fa-envelope mr-2"></i>
                 Send Message
-              </button>
-              <button class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+              </a>
+              <a href="tel:<%= dealershipPhone %>" class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors inline-flex items-center justify-center">
                 <i class="fas fa-calendar mr-2"></i>
                 Schedule Test Drive
-              </button>
+              </a>
             </div>
           </div>
 
-          <!-- Financing -->
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Financing Options</h3>
-            <p class="text-gray-600 text-sm mb-4">Get pre-approved for financing and see your monthly payment options.</p>
-            <button class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors">
-              <i class="fas fa-calculator mr-2"></i>
-              Calculate Payment
-            </button>
-          </div>
         </div>
       </div>
 
@@ -256,7 +274,7 @@
               <i class="fas fa-map-marker-alt text-blue-500 mt-1"></i>
               <div>
                 <h4 class="font-medium text-gray-900">Location</h4>
-                <p class="text-gray-600 text-sm">123 Auto Drive, Dream City, DC 12345</p>
+                <p class="text-gray-600 text-sm">580 Dodge Ave NW, Elk River, MN 55330</p>
               </div>
             </div>
             <div class="flex items-start gap-3">
@@ -274,10 +292,10 @@
               </div>
             </div>
           </div>
-          <button class="w-full mt-4 border border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition-colors">
+          <a href="https://www.google.com/maps/place/580+Dodge+Ave+NW,+Elk+River,+MN+55330" target="_blank" class="w-full mt-4 border border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition-colors inline-flex items-center justify-center">
             <i class="fas fa-directions mr-2"></i>
             Get Directions
-          </button>
+          </a>
         </div>
       </div>
     </div>

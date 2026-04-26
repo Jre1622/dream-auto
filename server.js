@@ -459,6 +459,11 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use((req, res, next) => {
+  res.locals.currentPath = req.path;
+  next();
+});
+
 app.locals.dealershipPhone = process.env.DEALERSHIP_PHONE;
 
 app.use("/admin", adminRouter);

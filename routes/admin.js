@@ -1,9 +1,44 @@
 const express = require("express");
-const rateLimit = require("express-rate-limit");
 const multer = require("multer");
 const db = require("../db/database");
 const { uploadCarImages, getCarImages, deleteCarImage } = require("../utils/imageUpload");
 const router = express.Router();
+
+function titleCase(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function formatEngine(data) {
+  const liters = parseFloat(data.DisplacementL);
+  const literText = Number.isFinite(liters) ? `${liters.toFixed(1)}L` : "";
+  const cylinders = data.EngineCylinders ? `V${data.EngineCylinders}` : "";
+  const valveTrain = data.ValveTrainDesign || "";
+  return [literText, cylinders, valveTrain.includes("SOHC") ? "SOHC" : valveTrain.includes("DOHC") ? "DOHC" : ""].filter(Boolean).join(" ");
+}
+
+function normalizeVinData(data) {
+  const year = data.ModelYear || "";
+  const make = titleCase(data.Make);
+  const model = titleCase(data.Model);
+  const trim = data.Trim || "";
+  const title = [year, make, model, trim].filter(Boolean).join(" ");
+
+  return {
+    vin: data.VIN || "",
+    title,
+    year,
+    make,
+    model,
+    trim,
+    engine: formatEngine(data),
+    transmission: titleCase(data.TransmissionStyle),
+    fuel_type: titleCase(data.FuelTypePrimary),
+    drive_type: data.DriveType || "",
+    body_style: data.BodyClass || "",
+  };
+}
 
 // Configure multer for memory storage
 const upload = multer({
@@ -42,17 +77,33 @@ function basicAuth(req, res, next) {
   }
 }
 
-// Rate limiting for admin routes
-const adminLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // limit each IP to 10 requests per windowMs
-  message: "Too many requests, please try again later.",
-  standardHeaders: true,
-  legacyHeaders: false,
+router.use(basicAuth);
+
+router.get("/decode-vin/:vin", async (req, res) => {
+  const vin = String(req.params.vin || "").trim().toUpperCase();
+
+  if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)) {
+    return res.status(400).json({ error: "Enter a valid 17-character VIN." });
+  }
+
+  try {
+    const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${vin}?format=json`);
+    const json = await response.json();
+    const result = json.Results && json.Results[0];
+
+    if (!result || result.ErrorCode !== "0") {
+      return res.status(422).json({ error: result?.ErrorText || "VIN could not be decoded." });
+    }
+
+    res.json(normalizeVinData(result));
+  } catch (err) {
+    console.error("VIN decode error:", err.message);
+    res.status(500).json({ error: "VIN lookup failed. Try again." });
+  }
 });
 
 // Admin Dashboard - Main page
-router.get("/", adminLimiter, basicAuth, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     // Get all cars from database
     const cars = await new Promise((resolve, reject) => {
@@ -82,19 +133,19 @@ router.get("/", adminLimiter, basicAuth, async (req, res) => {
 });
 
 // Add Car - GET form
-router.get("/add-car", basicAuth, (req, res) => {
-  res.render("admin/add-car", { error: null, success: null });
+router.get("/add-car", (req, res) => {
+  res.render("admin/add-car", { car: {}, error: null, success: null });
 });
 
 // Add Car - POST form with image upload
-router.post("/add-car", basicAuth, upload.array("images", 20), async (req, res) => {
-  const { title, year, make, model, price, mileage, vin, engine, transmission, features, carfax_url, is_featured } = req.body;
+router.post("/add-car", upload.array("images", 20), async (req, res) => {
+  const { title, year, make, model, price, mileage, vin, engine, transmission, drive_type, fuel_type, exterior_color, interior_color, body_style, title_status, stock_number, description, features, is_featured } = req.body;
 
   const sql = `INSERT INTO cars 
-    (title, year, make, model, price, mileage, vin, engine, transmission, features, carfax_url, is_featured) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    (title, year, make, model, price, mileage, vin, engine, transmission, drive_type, fuel_type, exterior_color, interior_color, body_style, title_status, stock_number, description, carfax_url, features, is_featured) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  const params = [title, parseInt(year), make, model, parseInt(price), parseInt(mileage), vin, engine, transmission, features, carfax_url, is_featured ? 1 : 0];
+  const params = [title, parseInt(year), make, model, parseInt(price), parseInt(mileage), vin, engine, transmission, drive_type, fuel_type, exterior_color, interior_color, body_style, title_status, stock_number, description, "", features, is_featured ? 1 : 0];
 
   try {
     // First, insert the car
@@ -119,12 +170,14 @@ router.post("/add-car", basicAuth, upload.array("images", 20), async (req, res) 
     const errorMessage = uploadResults.failed.length > 0 ? `Some images failed to upload: ${uploadResults.failed.map((f) => f.filename).join(", ")}` : null;
 
     res.render("admin/add-car", {
+      car: {},
       error: errorMessage,
       success: successMessage,
     });
   } catch (err) {
     console.error(err);
     res.render("admin/add-car", {
+      car: req.body,
       error: err.message.includes("UNIQUE") ? "VIN already exists" : "Database error",
       success: null,
     });
@@ -132,7 +185,7 @@ router.post("/add-car", basicAuth, upload.array("images", 20), async (req, res) 
 });
 
 // Edit Car - GET form
-router.get("/edit-car/:id", basicAuth, async (req, res) => {
+router.get("/edit-car/:id", async (req, res) => {
   const carId = req.params.id;
 
   try {
@@ -159,36 +212,27 @@ router.get("/edit-car/:id", basicAuth, async (req, res) => {
 });
 
 // Edit Car - POST form with image upload
-router.post("/edit-car/:id", basicAuth, upload.array("images", 20), async (req, res) => {
+router.post("/edit-car/:id", upload.array("images", 20), async (req, res) => {
   const carId = req.params.id;
-  console.log("Edit car POST request received for car ID:", carId);
-  console.log("Request body:", req.body);
-  console.log("Files uploaded:", req.files ? req.files.length : 0);
 
-  const { title, year, make, model, price, mileage, vin, engine, transmission, features, carfax_url, is_featured } = req.body;
+  const { title, year, make, model, price, mileage, vin, engine, transmission, drive_type, fuel_type, exterior_color, interior_color, body_style, title_status, stock_number, description, features, is_featured } = req.body;
   const sold = req.body.sold === "1" ? 1 : 0; // Ensure 'sold' is correctly handled
 
   const sql = `UPDATE cars SET 
     title=?, year=?, make=?, model=?, price=?, mileage=?, vin=?, engine=?, 
-    transmission=?, features=?, carfax_url=?, is_featured=?, sold=?
+    transmission=?, drive_type=?, fuel_type=?, exterior_color=?, interior_color=?, body_style=?, title_status=?, stock_number=?, description=?, carfax_url=?, features=?, is_featured=?, sold=?
     WHERE id=?`;
 
-  const params = [title, parseInt(year), make, model, parseInt(price), parseInt(mileage), vin, engine, transmission, features, carfax_url, is_featured ? 1 : 0, sold, carId];
+  const params = [title, parseInt(year), make, model, parseInt(price), parseInt(mileage), vin, engine, transmission, drive_type, fuel_type, exterior_color, interior_color, body_style, title_status, stock_number, description, "", features, is_featured ? 1 : 0, sold, carId];
 
   try {
-    console.log("Attempting to update car with SQL:", sql);
-    console.log("Parameters:", params);
-
     // Update car details
     await new Promise((resolve, reject) => {
       db.run(sql, params, function (err) {
         if (err) {
           console.error("Database update error:", err);
           reject(err);
-        } else {
-          console.log("Car updated successfully, changes:", this.changes);
-          resolve();
-        }
+        } else resolve();
       });
     });
 
@@ -246,8 +290,11 @@ router.post("/edit-car/:id", basicAuth, upload.array("images", 20), async (req, 
 });
 
 // Delete Car
-router.post("/delete-car/:id", basicAuth, (req, res) => {
+router.post("/delete-car/:id", async (req, res) => {
   const carId = req.params.id;
+  const images = await getCarImages(carId).catch(() => []);
+  await Promise.all(images.map((image) => deleteCarImage(image.id)));
+
   db.run("DELETE FROM cars WHERE id = ?", [carId], function (err) {
     if (err) {
       console.error(err);
@@ -257,7 +304,7 @@ router.post("/delete-car/:id", basicAuth, (req, res) => {
 });
 
 // Toggle Sold Status
-router.post("/toggle-sold/:id", basicAuth, (req, res) => {
+router.post("/toggle-sold/:id", (req, res) => {
   const carId = req.params.id;
   db.run("UPDATE cars SET sold = NOT sold WHERE id = ?", [carId], function (err) {
     if (err) {
@@ -268,46 +315,16 @@ router.post("/toggle-sold/:id", basicAuth, (req, res) => {
 });
 
 // Delete Image
-router.post("/delete-image/:imageId", basicAuth, async (req, res) => {
+router.post("/delete-image/:imageId", async (req, res) => {
   const imageId = req.params.imageId;
-  const carId = req.body.carId;
 
   try {
     const success = await deleteCarImage(imageId);
-    if (success) {
-      res.redirect(`/admin/edit-car/${carId}?success=Image deleted successfully`);
-    } else {
-      res.redirect(`/admin/edit-car/${carId}?error=Failed to delete image`);
-    }
+    res.json({ success });
   } catch (err) {
     console.error(err);
-    res.redirect(`/admin/edit-car/${carId}?error=Error deleting image`);
+    res.status(500).json({ success: false, message: "Error deleting image" });
   }
-});
-
-// POST /admin/update-image-order/:imageId - Update image display order
-router.post("/update-image-order/:imageId", (req, res) => {
-  const { imageId } = req.params;
-  const { displayOrder } = req.body;
-
-  if (!displayOrder || isNaN(displayOrder)) {
-    return res.status(400).json({ error: "Valid display order is required" });
-  }
-
-  const query = "UPDATE car_images SET display_order = ? WHERE id = ?";
-
-  db.run(query, [parseInt(displayOrder), imageId], function (err) {
-    if (err) {
-      console.error("Database error:", err);
-      return res.status(500).json({ error: "Failed to update image order" });
-    }
-
-    if (this.changes === 0) {
-      return res.status(404).json({ error: "Image not found" });
-    }
-
-    res.json({ success: true, message: "Image order updated successfully" });
-  });
 });
 
 // POST /admin/update-images-order - Batch update image display orders

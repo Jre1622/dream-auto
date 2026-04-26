@@ -1,18 +1,20 @@
-<header class="fixed w-full top-0 z-50 bg-transparent backdrop-blur-sm transition-all duration-300">
+<% const isHome = currentPath === '/'; %>
+<% const headerText = isHome ? 'text-white' : 'text-gray-900'; %>
+<header data-transparent="<%= isHome ? 'true' : 'false' %>" class="<%= isHome ? 'fixed bg-transparent' : 'sticky bg-white shadow-sm border-b border-gray-100' %> w-full top-0 z-50 transition-all duration-300">
   <div class="container mx-auto px-4 py-4">
     <div class="flex justify-between items-center">
       <a href="/" class="flex items-center space-x-2">
         <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-600 to-blue-600 flex items-center justify-center text-white font-bold text-xl">DA</div>
-        <span class="text-xl font-bold text-white">Dream Auto</span>
+          <span class="text-xl font-bold <%= headerText %>">Dream Auto</span>
       </a>
 
       <!-- Desktop Nav -->
       <nav class="hidden md:flex space-x-6">
-        <a href="/inventory" class="text-white hover:text-primary-200 font-medium py-2 border-b-2 border-transparent hover:border-primary-300 transition-colors text-lg">Inventory</a>
-        <a href="/calculator" class="text-white hover:text-primary-200 font-medium py-2 border-b-2 border-transparent hover:border-primary-300 transition-colors text-lg">Calculator</a>
+        <a href="/inventory" class="<%= headerText %> hover:text-primary-600 font-medium py-2 border-b-2 border-transparent hover:border-primary-300 transition-colors text-lg">Inventory</a>
+        <a href="/calculator" class="<%= headerText %> hover:text-primary-600 font-medium py-2 border-b-2 border-transparent hover:border-primary-300 transition-colors text-lg">Calculator</a>
         <a
           href="tel:<%= dealershipPhone %>"
-          class="border-2 border-white text-white hover:bg-white hover:text-primary-700 font-medium py-2 px-4 rounded-lg transition transform hover:-translate-y-0.5 text-lg flex items-center space-x-2"
+          class="border-2 <%= isHome ? 'border-white text-white hover:bg-white' : 'border-primary-600 text-primary-700 hover:bg-primary-50' %> hover:text-primary-700 font-medium py-2 px-4 rounded-lg transition transform hover:-translate-y-0.5 text-lg flex items-center space-x-2"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -27,7 +29,7 @@
       </nav>
 
       <!-- Mobile Menu Button -->
-      <button id="mobile-menu-button" class="md:hidden text-white hover:text-primary-200 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300">
+      <button id="mobile-menu-button" class="md:hidden <%= headerText %> hover:text-primary-600 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>

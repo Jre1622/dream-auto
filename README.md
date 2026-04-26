@@ -13,7 +13,7 @@ Dream Auto is the website and inventory manager for Dream Auto in Elk River, MN.
 - Admin dashboard for adding/editing/deleting vehicles
 - Multiple vehicle image uploads to Cloudflare R2
 - Featured/sold vehicle flags
-- Payment calculator
+- Minnesota tax/title/license calculator
 - Contract form with downloadable PDF generation
 
 ## Stack
@@ -196,7 +196,7 @@ Public:
 - `/` homepage
 - `/inventory` inventory listing/filtering
 - `/inventory/:id` vehicle detail page
-- `/calculator` payment calculator
+- `/calculator` Minnesota tax/title/license calculator
 - `/contract` contract form
 - `/generate-contract` PDF download route
 
@@ -224,5 +224,4 @@ Admin uses HTTP Basic Auth from `.env`.
 - Add Google Search Console / Bing Search Console
 - Add analytics
 - Add VIN copy button
-- Add Carfax badge/link UI
 - Add open/closed banner based on business hours

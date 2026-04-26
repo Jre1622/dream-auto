@@ -1,0 +1,291 @@
+<% const isEdit = mode === 'edit'; %>
+<% const v = car || {}; %>
+
+<form method="POST" action="<%= isEdit ? `/admin/edit-car/${v.id}` : '/admin/add-car' %>" enctype="multipart/form-data" class="space-y-8">
+  <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Vehicle Basics</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div>
+        <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Listing Title *</label>
+        <input id="title" name="title" required value="<%= v.title || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="2014 Honda Civic LX">
+      </div>
+      <div>
+        <label for="vin" class="block text-sm font-medium text-gray-700 mb-1">VIN *</label>
+        <div class="flex gap-2">
+          <input id="vin" name="vin" required value="<%= v.vin || '' %>" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase" placeholder="17-character VIN" maxlength="17">
+          <button type="button" id="decodeVinButton" class="px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 whitespace-nowrap">Decode</button>
+        </div>
+        <p id="vinDecodeStatus" class="text-xs text-gray-500 mt-1">Enter a VIN and click Decode to autofill vehicle details.</p>
+      </div>
+      <div>
+        <label for="year" class="block text-sm font-medium text-gray-700 mb-1">Year *</label>
+        <input type="number" id="year" name="year" required min="1900" max="2030" value="<%= v.year || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label for="make" class="block text-sm font-medium text-gray-700 mb-1">Make *</label>
+        <input id="make" name="make" required value="<%= v.make || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Model *</label>
+        <input id="model" name="model" required value="<%= v.model || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label for="transmission" class="block text-sm font-medium text-gray-700 mb-1">Transmission</label>
+        <select id="transmission" name="transmission" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Select Transmission</option>
+          <% ['Automatic', 'Manual', 'CVT'].forEach(option => { %>
+            <option value="<%= option %>" <%= v.transmission === option ? 'selected' : '' %>><%= option %></option>
+          <% }) %>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Price & Details</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div>
+        <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Price ($) *</label>
+        <input type="number" id="price" name="price" required min="0" value="<%= v.price || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label for="mileage" class="block text-sm font-medium text-gray-700 mb-1">Mileage *</label>
+        <input type="number" id="mileage" name="mileage" required min="0" value="<%= v.mileage || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label for="engine" class="block text-sm font-medium text-gray-700 mb-1">Engine</label>
+        <input id="engine" name="engine" value="<%= v.engine || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="2.0L 4-Cylinder">
+      </div>
+      <div>
+        <label for="drive_type" class="block text-sm font-medium text-gray-700 mb-1">Drive</label>
+        <select id="drive_type" name="drive_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Select Drive</option>
+          <% ['FWD', 'RWD', 'AWD', '4WD', '4x4'].forEach(option => { %>
+            <option value="<%= option %>" <%= v.drive_type === option ? 'selected' : '' %>><%= option %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label for="fuel_type" class="block text-sm font-medium text-gray-700 mb-1">Fuel</label>
+        <select id="fuel_type" name="fuel_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Select Fuel</option>
+          <% ['Gasoline', 'Diesel', 'Hybrid', 'Electric', 'Flex Fuel'].forEach(option => { %>
+            <option value="<%= option %>" <%= v.fuel_type === option ? 'selected' : '' %>><%= option %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label for="body_style" class="block text-sm font-medium text-gray-700 mb-1">Body Style</label>
+        <input id="body_style" name="body_style" value="<%= v.body_style || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Sedan, SUV, Truck">
+      </div>
+      <div>
+        <label for="exterior_color" class="block text-sm font-medium text-gray-700 mb-1">Exterior Color</label>
+        <input id="exterior_color" name="exterior_color" value="<%= v.exterior_color || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Black">
+      </div>
+      <div>
+        <label for="interior_color" class="block text-sm font-medium text-gray-700 mb-1">Interior Color</label>
+        <input id="interior_color" name="interior_color" value="<%= v.interior_color || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Gray">
+      </div>
+      <div>
+        <label for="title_status" class="block text-sm font-medium text-gray-700 mb-1">Title Status</label>
+        <select id="title_status" name="title_status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Select Title Status</option>
+          <% ['Clean', 'Prior Salvage'].forEach(option => { %>
+            <option value="<%= option %>" <%= v.title_status === option ? 'selected' : '' %>><%= option %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label for="stock_number" class="block text-sm font-medium text-gray-700 mb-1">Stock #</label>
+        <input id="stock_number" name="stock_number" value="<%= v.stock_number || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Optional">
+      </div>
+      <div class="md:col-span-2">
+        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Short notes about condition, recent service, etc."><%= v.description || '' %></textarea>
+      </div>
+      <div class="md:col-span-2">
+        <label for="features" class="block text-sm font-medium text-gray-700 mb-1">Features</label>
+        <textarea id="features" name="features" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Bluetooth, Backup Camera, Heated Seats"><%= v.features || '' %></textarea>
+      </div>
+    </div>
+  </section>
+
+  <% if (isEdit && images && images.length) { %>
+    <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900">Current Photos</h2>
+      <p class="text-sm text-gray-600 mt-1 mb-4">Drag photos to reorder. The first photo is used as the main listing image.</p>
+      <div id="imageContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <% images.forEach((image, index) => { %>
+          <div class="relative group cursor-move" draggable="true" data-image-id="<%= image.id %>">
+            <img src="<%= image.image_url %>" alt="Car image" class="w-full h-32 object-cover rounded-lg border border-gray-300">
+            <div class="image-order-badge absolute top-2 left-2 <%= index === 0 ? 'bg-green-600' : 'bg-gray-700' %> text-white text-xs px-2 py-1 rounded"><%= index === 0 ? 'Primary' : `#${index + 1}` %></div>
+            <button type="button" data-delete-image="<%= image.id %>" class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700">Delete</button>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= isEdit ? 'Add More Photos' : 'Photos' %></h2>
+    <input type="file" id="images" name="images" multiple accept="image/jpeg,image/jpg,image/png,image/webp" class="w-full px-3 py-2 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+    <p class="text-xs text-gray-500 mt-2">Upload JPEG, PNG, or WebP images. Up to 20 files, 20MB each.</p>
+    <div id="imagePreview" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 hidden"></div>
+  </section>
+
+  <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Status</h2>
+    <div class="flex flex-wrap gap-6">
+      <label class="flex items-center gap-2 text-sm text-gray-700">
+        <input type="checkbox" name="is_featured" value="1" <%= v.is_featured ? 'checked' : '' %> class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+        Featured vehicle
+      </label>
+      <% if (isEdit) { %>
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" name="sold" value="1" <%= v.sold ? 'checked' : '' %> class="h-4 w-4 text-red-600 border-gray-300 rounded">
+          Mark as sold
+        </label>
+      <% } %>
+    </div>
+  </section>
+
+  <div class="sticky bottom-0 bg-gray-100/95 backdrop-blur border-t border-gray-200 py-4 flex justify-end gap-3">
+    <a href="/admin" class="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-white">Cancel</a>
+    <button type="submit" class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><%= isEdit ? 'Save Changes' : 'Add Vehicle' %></button>
+  </div>
+</form>
+
+<script>
+  const imageInput = document.getElementById('images');
+  const preview = document.getElementById('imagePreview');
+
+  imageInput?.addEventListener('change', () => {
+    preview.innerHTML = '';
+    const files = Array.from(imageInput.files || []);
+    preview.classList.toggle('hidden', files.length === 0);
+
+    files.forEach((file, index) => {
+      if (!file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const item = document.createElement('div');
+        item.className = 'relative';
+        item.innerHTML = `<img src="${event.target.result}" class="w-full h-32 object-cover rounded-lg border border-gray-300"><div class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">${index === 0 && !document.getElementById('imageContainer') ? 'Primary' : index + 1}</div>`;
+        preview.appendChild(item);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  const imageContainer = document.getElementById('imageContainer');
+  let draggedItem = null;
+
+  imageContainer?.addEventListener('dragstart', (event) => {
+    draggedItem = event.target.closest('[data-image-id]');
+    draggedItem?.classList.add('opacity-50');
+  });
+
+  imageContainer?.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    const target = event.target.closest('[data-image-id]');
+    if (!target || !draggedItem || target === draggedItem) return;
+    const rect = target.getBoundingClientRect();
+    imageContainer.insertBefore(draggedItem, event.clientY > rect.top + rect.height / 2 ? target.nextSibling : target);
+  });
+
+  imageContainer?.addEventListener('dragend', async () => {
+    draggedItem?.classList.remove('opacity-50');
+    draggedItem = null;
+    await saveImageOrder();
+  });
+
+  document.querySelectorAll('[data-delete-image]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      if (!confirm('Delete this image?')) return;
+      const response = await fetch(`/admin/delete-image/${button.dataset.deleteImage}`, { method: 'POST' });
+      const result = await response.json().catch(() => ({ success: false }));
+      if (result.success) {
+        button.closest('[data-image-id]').remove();
+        await saveImageOrder();
+      } else {
+        alert('Could not delete image.');
+      }
+    });
+  });
+
+  async function saveImageOrder() {
+    if (!imageContainer) return;
+    const images = Array.from(imageContainer.children);
+    images.forEach((item, index) => {
+      const badge = item.querySelector('.image-order-badge');
+      badge.textContent = index === 0 ? 'Primary' : `#${index + 1}`;
+      badge.className = `image-order-badge absolute top-2 left-2 ${index === 0 ? 'bg-green-600' : 'bg-gray-700'} text-white text-xs px-2 py-1 rounded`;
+    });
+
+    const updates = images.map((item, index) => ({ imageId: item.dataset.imageId, displayOrder: index + 1 }));
+    if (!updates.length) return;
+    await fetch('/admin/update-images-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ updates })
+    });
+  }
+
+  const vinInput = document.getElementById('vin');
+  const decodeButton = document.getElementById('decodeVinButton');
+  const decodeStatus = document.getElementById('vinDecodeStatus');
+
+  decodeButton?.addEventListener('click', decodeVin);
+  vinInput?.addEventListener('input', () => {
+    vinInput.value = vinInput.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '').slice(0, 17);
+  });
+  vinInput?.addEventListener('blur', () => {
+    if (vinInput.value.length === 17) decodeVin();
+  });
+
+  async function decodeVin() {
+    const vin = vinInput.value.trim().toUpperCase();
+    if (vin.length !== 17) {
+      decodeStatus.textContent = 'VIN must be 17 characters.';
+      decodeStatus.className = 'text-xs text-red-600 mt-1';
+      return;
+    }
+
+    decodeButton.disabled = true;
+    decodeButton.textContent = 'Decoding...';
+    decodeStatus.textContent = 'Looking up VIN...';
+    decodeStatus.className = 'text-xs text-gray-500 mt-1';
+
+    try {
+      const response = await fetch(`/admin/decode-vin/${vin}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'VIN lookup failed.');
+
+      setValue('title', data.title);
+      setValue('year', data.year);
+      setValue('make', data.make);
+      setValue('model', data.model);
+      setValue('engine', data.engine);
+      setValue('transmission', data.transmission);
+      setValue('fuel_type', data.fuel_type);
+      setValue('drive_type', data.drive_type);
+      setValue('body_style', data.body_style);
+
+      const notes = [data.trim, data.body_style, data.fuel_type].filter(Boolean).join(' · ');
+      decodeStatus.textContent = notes ? `Decoded: ${notes}` : 'VIN decoded successfully.';
+      decodeStatus.className = 'text-xs text-green-700 mt-1';
+    } catch (error) {
+      decodeStatus.textContent = error.message;
+      decodeStatus.className = 'text-xs text-red-600 mt-1';
+    } finally {
+      decodeButton.disabled = false;
+      decodeButton.textContent = 'Decode';
+    }
+  }
+
+  function setValue(id, value) {
+    if (!value) return;
+    const field = document.getElementById(id);
+    if (field) field.value = value;
+  }
+</script>

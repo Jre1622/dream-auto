@@ -125,6 +125,7 @@ class HeaderScrollEffect {
     
     init() {
         if (!this.header) return;
+        if (this.header.dataset.transparent !== 'true') return;
         
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
@@ -202,7 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
             'find your perfect car',
             'get the best deals',
             'trade in your vehicle',
-            'secure financing',
             'consign your vehicle'
         ];
         new TypewriterEffect(typewriterElement, phrases, 80, 40, 2500);

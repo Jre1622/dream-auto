@@ -1,6 +1,5 @@
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
-const fs = require("fs");
 
 // Create database directory if it doesn't exist
 const dbPath = path.resolve(__dirname, "database.db");
@@ -24,9 +23,17 @@ const db = new sqlite3.Database(dbPath, (err) => {
       vin TEXT NOT NULL UNIQUE,
       engine TEXT,
       transmission TEXT,
+      drive_type TEXT,
+      fuel_type TEXT,
+      exterior_color TEXT,
+      interior_color TEXT,
+      body_style TEXT,
+      title_status TEXT,
+      stock_number TEXT,
+      description TEXT,
+      carfax_url TEXT DEFAULT '',
       features TEXT,
       video_url TEXT,
-      carfax_url TEXT,
       is_featured BOOLEAN DEFAULT 0,
       sold BOOLEAN DEFAULT 0
     )`,
@@ -35,6 +42,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
           console.error("Cars table creation error:", err.message);
         } else {
           console.log("Cars table created or already exists");
+          addMissingCarColumns();
         }
       }
     );
@@ -86,6 +94,33 @@ const db = new sqlite3.Database(dbPath, (err) => {
           } else {
             console.log(`Database index ${i + 1}/${indexes.length} created successfully`);
           }
+        });
+      });
+    }
+
+    function addMissingCarColumns() {
+      const columns = [
+        ["drive_type", "TEXT"],
+        ["fuel_type", "TEXT"],
+        ["exterior_color", "TEXT"],
+        ["interior_color", "TEXT"],
+        ["body_style", "TEXT"],
+        ["title_status", "TEXT"],
+        ["stock_number", "TEXT"],
+        ["description", "TEXT"],
+        ["carfax_url", "TEXT DEFAULT ''"],
+      ];
+
+      db.all("PRAGMA table_info(cars)", (err, rows) => {
+        if (err) return console.error("Schema check error:", err.message);
+        const existing = new Set(rows.map((row) => row.name));
+
+        columns.forEach(([name, type]) => {
+          if (existing.has(name)) return;
+          db.run(`ALTER TABLE cars ADD COLUMN ${name} ${type}`, (alterErr) => {
+            if (alterErr) console.error(`Add column ${name} error:`, alterErr.message);
+            else console.log(`Added cars.${name} column`);
+          });
         });
       });
     }
