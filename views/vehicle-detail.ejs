@@ -222,13 +222,9 @@
                 <i class="fas fa-phone mr-2"></i>
                 Call Now
               </a>
-              <a href="mailto:DreamAutosMN@gmail.com?subject=<%= encodeURIComponent(`Interested in ${car.year} ${car.make} ${car.model}`) %>" class="w-full border border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition-colors inline-flex items-center justify-center">
-                <i class="fas fa-envelope mr-2"></i>
+              <a href="sms:<%= dealershipPhone %>?body=<%= encodeURIComponent(`Interested in the ${car.year} ${car.make} ${car.model}. Please send me more info!`) %>" class="w-full border border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition-colors inline-flex items-center justify-center">
+                <i class="fas fa-comment mr-2"></i>
                 Send Message
-              </a>
-              <a href="tel:<%= dealershipPhone %>" class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors inline-flex items-center justify-center">
-                <i class="fas fa-calendar mr-2"></i>
-                Schedule Test Drive
               </a>
             </div>
           </div>
